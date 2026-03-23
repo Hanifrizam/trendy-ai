@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@supabase/supabase-js": "^2.99.3",
+    "dotenv": "^17.3.1",
+    "google-trends-api": "^4.9.2"
+  }
+}

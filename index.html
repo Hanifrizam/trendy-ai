@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metan AI - Trend Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --sidebar-bg: #121214;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-main: #fafafa;
+            --text-dim: #a1a1aa;
+        }
+
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- TOAST NOTIFICATION --- */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(20, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-left: 4px solid var(--accent-blue);
+            transform: translateX(120%);
+            animation: slideInToast 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast.error { border-left-color: #ef4444; }
+        .toast.success { border-left-color: #10b981; }
+
+        @keyframes slideInToast { to { transform: translateX(0); } }
+        @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-20px); } }
+
+        /* --- AUTH SCREEN --- */
+        #auth-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #18181b, #09090b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            padding: 50px 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            animation: floatUp 0.6s ease forwards;
+        }
+
+        @keyframes floatUp { to { transform: translateY(0); } }
+
+        .auth-card h2 { margin-top: 0; color: var(--text-main); font-size: 28px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .auth-card h2 i { color: var(--accent-blue); }
+        .auth-card p { color: var(--text-dim); font-size: 15px; margin-bottom: 35px; }
+        
+        .auth-input {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 12px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .auth-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .auth-btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+        .auth-btn.secondary { background: transparent; border: 1px solid var(--border-color); box-shadow: none; color: var(--text-dim); }
+        .auth-btn.secondary:hover { background: rgba(255,255,255,0.05); color: white; transform: translateY(0); }
+
+        /* --- APP CONTAINER --- */
+        #app-screen { display: none; width: 100%; height: 100%; }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+            padding: 0 20px;
+        }
+        .sidebar-header i { color: var(--accent-blue); }
+
+        .new-chat-btn {
+            background: rgba(255,255,255,0.03);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 12px;
+            margin: 0 20px 20px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .new-chat-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: var(--accent-blue);
+        }
+
+        .history-container { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding: 0 15px; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        .history-item {
+            padding: 0 12px;
+            height: 48px; 
+            border-radius: 12px;
+            margin-bottom: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13.5px;
+            transition: all 0.2s;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            color: var(--text-dim);
+        }
+
+        .history-item:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.05);
+            color: white;
+        }
+
+        .history-text {
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            flex-grow: 1;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 180px;
+        }
+
+        .delete-btn { color: #ef4444; cursor: pointer; opacity: 0; transition: opacity 0.2s; padding: 5px; }
+        .history-item:hover .delete-btn { opacity: 0.7; }
+        .delete-btn:hover { opacity: 1 !important; transform: scale(1.1); }
+
+        .logout-btn {
+            margin: 20px 20px 0 20px;
+            padding: 12px;
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+
+        /* --- MAIN --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent);
+            min-width: 0;
+            position: relative;
+        }
+
+        .mobile-header {
+            display: none;
+            padding: 15px 20px;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 50;
+        }
+        .menu-toggle { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; padding: 5px; }
+        .mobile-title { font-weight: 600; margin-left: 15px; font-size: 16px; }
+
+        .display-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 40px 15%;
+            scroll-behavior: smooth;
+        }
+
+        .ai-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: cardAppear 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes cardAppear { to { opacity: 1; transform: translateY(0); } }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 12px;
+        }
+
+        .content-body { line-height: 1.8; color: #d1d1d6; font-size: 15.5px; }
+        .content-body strong { color: #ffffff; font-weight: 600; }
+        .content-body ul { margin: 12px 0; padding-left: 20px; }
+        .content-body li { margin-bottom: 10px; padding-left: 5px; }
+
+        /* --- INPUT AREA & TOGGLES --- */
+        .input-box {
+            padding: 20px 15% 40px;
+            background: linear-gradient(to top, var(--bg-dark) 80%, transparent);
+            position: relative;
+        }
+
+        .feature-toggles { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .toggle-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-dim);
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .toggle-btn:hover { background: rgba(255,255,255,0.08); color: white; }
+        .toggle-btn.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
+
+        .input-wrapper {
+            background: rgba(24, 24, 27, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 10px 10px 10px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        .input-wrapper:focus-within { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15); }
+
+        .input-wrapper input { flex-grow: 1; background: transparent; border: none; color: white; font-size: 15px; outline: none; }
+        .input-wrapper input::placeholder { color: #52525b; }
+        
+        select#input-platform { background:transparent; color:var(--accent-blue); border:none; outline:none; font-size:14px; font-weight:600; cursor:pointer; }
+        select#input-platform option { background: var(--bg-dark); color: white; }
+
+        .action-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .action-btn:hover { background: #2563eb; transform: scale(1.05); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+
+        /* --- FUTURISTIC LOADER --- */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: -60px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(24, 24, 27, 0.9);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+        }
+        .spinner {
+            width: 20px; height: 20px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loading-text { font-size: 13.5px; font-weight: 500; color: var(--text-main); }
+        .loading-text span { color: var(--accent-blue); animation: pulse 1.5s infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .mobile-header { display: flex; }
+            .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; }
+            .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+            .sidebar-overlay.active { display: block; opacity: 1; }
+            
+            .display-area { padding: 30px 5%; }
+            .input-box { padding: 15px 5% 30px; }
+            .input-wrapper { flex-wrap: wrap; padding: 15px; border-radius: 16px; }
+            .input-wrapper input[type="text"] { min-width: 100%; border-left: none !important; padding-left: 0 !important; margin-top: 5px; }
+            .action-btn { width: 100%; justify-content: center; margin-top: 10px; }
+            .feature-toggles { justify-content: center; }
+            
+            .loading-overlay { top: -80px; width: 90%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2><i class="fa-solid fa-bolt"></i> Metan AI</h2>
+            <p>Ruang kerja pintar untuk pertumbuhan bisnismu</p>
+            <input type="email" id="auth-email" class="auth-input" placeholder="Alamat Email">
+            <input type="password" id="auth-password" class="auth-input" placeholder="Password rahasia">
+            <button class="auth-btn" onclick="login()">Masuk ke Sistem</button>
+            <button class="auth-btn secondary" onclick="register()">Buat Akun Baru</button>
+        </div>
+    </div>
+
+    <div id="app-screen">
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-bolt"></i> Metan AI
+            </div>
+            
+            <button class="new-chat-btn" onclick="startNewChat()">
+                <i class="fa-solid fa-plus"></i> Topik Baru
+            </button>
+
+            <div class="history-container" id="history-list"></div>
+            <div class="logout-btn" onclick="logout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Akhiri Sesi</div>
+        </div>
+
+        <div class="main-content">
+            <div class="mobile-header">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                <div class="mobile-title">Metan Intelligence</div>
+            </div>
+
+            <div class="display-area" id="display-area">
+                <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.8s ease;">
+                    <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
+                    <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Metan Intelligence.</h1>
+                    <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
+                        Tentukan tren yang sedang hangat, pilih mode analisis, dan dapatkan strategi pemasaran instan.
+                    </p>
+                </div>
+            </div>
+
+            <div class="input-box">
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="spinner"></div>
+                    <div class="loading-text" id="loading-text">Memproses...</div>
+                </div>
+
+                <div class="feature-toggles">
+                    <button class="toggle-btn active" id="toggle-content" onclick="this.classList.toggle('active')">
+                        <i class="fa-solid fa-video"></i> Ide Konten
+                    </button>
+                    <button class="toggle-btn active" id="toggle-sales" onclick="this.classList.toggle('active')">
+                        <i class="fa-solid fa-chart-line"></i> Strategi Jualan
+                    </button>
+                    <button class="toggle-btn" id="toggle-image" onclick="this.classList.toggle('active')">
+                        <i class="fa-solid fa-image"></i> Visual AI
+                    </button>
+                </div>
+
+                <div class="input-wrapper">
+                    <select id="input-platform">
+                        <option value="TikTok">TikTok</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Twitter">X / Twitter</option>
+                    </select>
+                    <input type="text" id="input-topic" placeholder="Ketik topik tren (misal: Roti Lumer)..." autocomplete="off">
+                    <input type="text" id="input-business" placeholder="Merek Bisnismu" style="width: 140px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 15px;" autocomplete="off">
+                    <button class="action-btn" onclick="processAnalysis()">
+                        Generate <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://cidccxpjstqnpisuxkcm.supabase.co'; 
+        const supabaseKey = 'sb_publishable_CM0leWbXShfwZ9riFphpYQ_r7kRQUPm'; 
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUser = null;
+
+        // ==========================================
+        // UI HELPERS 
+        // ==========================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i>' : '<i class="fa-solid fa-circle-exclamation" style="color:#ef4444;"></i>';
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOutToast 0.4s forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        }
+
+        function showLoading(message) {
+            const overlay = document.getElementById('loading-overlay');
+            const text = document.getElementById('loading-text');
+            text.innerHTML = message;
+            overlay.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // FUNGSI TOPIK BARU
+        function startNewChat() {
+            const displayArea = document.getElementById('display-area');
+            displayArea.innerHTML = `
+                <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.5s ease;">
+                    <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
+                    <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Metan Intelligence.</h1>
+                    <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
+                        Tentukan tren yang sedang hangat, pilih mode analisis, dan dapatkan strategi pemasaran instan.
+                    </p>
+                </div>
+            `;
+            document.getElementById('input-topic').value = '';
+            document.getElementById('input-topic').focus();
+            
+            if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                toggleSidebar();
+            }
+        }
+
+        // ==========================================
+        // SISTEM AUTENTIKASI
+        // ==========================================
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                currentUser = session.user;
+                document.getElementById('auth-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('app-screen').style.display = 'flex';
+                    showToast('Selamat datang kembali!', 'success');
+                    fetchHistory();
+                }, 400);
+            } else {
+                currentUser = null;
+                document.getElementById('auth-screen').style.display = 'flex';
+                setTimeout(() => document.getElementById('auth-screen').style.opacity = '1', 10);
+                document.getElementById('app-screen').style.display = 'none';
+            }
+        });
+
+        async function register() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            if (!email || password.length < 6) { showToast("Email wajib diisi dan password minimal 6 karakter!", "error"); return; }
+            
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            if (error) { showToast(error.message, "error"); } 
+            else { if(!data.session) showToast("Akun dibuat! Mencoba masuk...", "success"); }
+        }
+
+        async function login() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            if (!email || !password) { showToast("Lengkapi form login!", "error"); return; }
+
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) { showToast("Kredensial tidak valid!", "error"); }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            showToast("Berhasil keluar dari sistem.", "success");
+        }
+
+        // ==========================================
+        // SISTEM METAN AI & GLOBAL CACHE
+        // ==========================================
+        function formatMarkdown(text) {
+            let formatted = text;
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            formatted = formatted.replace(/###/g, '');
+            formatted = formatted.replace(/^[\*\-]\s+(.*)$/gm, '<ul><li>$1</li></ul>');
+            formatted = formatted.replace(/\n/g, '<br>');
+            formatted = formatted.replace(/<\/ul><br><ul>/g, '');
+            formatted = formatted.replace(/<br><ul/g, '<ul');
+            return formatted;
+        }
+
+        function renderResultToDisplay(topic, aiText, showImage = false) {
+            const displayArea = document.getElementById('display-area');
+            const welcomeMsg = document.getElementById('welcome-msg');
+            if (welcomeMsg) welcomeMsg.style.display = 'none';
+
+            const parts = aiText.split(/\d\./);
+            let resultHtml = `<div style="margin-bottom:40px;"><h2 style="color:white; font-size:32px; margin-bottom: 30px; letter-spacing: -0.5px;"># ${topic}</h2>`;
+            let delay = 0;
+
+            parts.forEach((p, index) => {
+                if(p.trim().length < 5) return;
+                let title = index === 1 ? "Analisis Pasar" : index === 2 ? "Ide Konten Viral" : "Strategi Konversi";
+                let icon = index === 1 ? "fa-magnifying-glass-chart" : index === 2 ? "fa-clapperboard" : "fa-money-bill-trend-up";
+                let cleanedText = formatMarkdown(p.trim());
+
+                resultHtml += `
+                    <div class="ai-card" style="animation-delay: ${delay}s">
+                        <div class="section-title"><i class="fa-solid ${icon}"></i> ${title}</div>
+                        <div class="content-body">${cleanedText}</div>
+                    </div>
+                `;
+                delay += 0.15;
+            });
+
+            if(showImage) {
+                resultHtml += `
+                    <div class="ai-card" style="animation-delay: ${delay}s">
+                        <div class="section-title"><i class="fa-solid fa-image"></i> Referensi Visual</div>
+                        <img src="https://source.unsplash.com/800x450/?${topic},food,aesthetic" style="width:100%; border-radius:14px; margin-top:10px; border: 1px solid rgba(255,255,255,0.05); object-fit: cover;">
+                    </div>
+                `;
+            }
+
+            resultHtml += `</div>`;
+            displayArea.innerHTML = resultHtml; 
+            displayArea.scrollTop = 0;
+            
+            if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                toggleSidebar();
+            }
+        }
+
+        async function processAnalysis() {
+            if (!currentUser) { showToast("Sesi habis, silakan login kembali.", "error"); return; }
+
+            const topic = document.getElementById('input-topic').value.trim();
+            const business = document.getElementById('input-business').value || 'UMKM F&B';
+            const platform = document.getElementById('input-platform').value;
+            const isContent = document.getElementById('toggle-content').classList.contains('active');
+            const isSales = document.getElementById('toggle-sales').classList.contains('active');
+            const isImage = document.getElementById('toggle-image').classList.contains('active');
+
+            if (!topic) { showToast("Masukkan topik tren terlebih dahulu!", "error"); return; }
+
+            try {
+                // 1. CEK GLOBAL CACHE (SEMUA USER)
+                showLoading("Menyisir <span>database global</span>...");
+                const { data: allCache } = await supabaseClient
+                    .from('trends_data')
+                    .select('*')
+                    .eq('platform', platform)
+                    // Tidak pakai eq('user_id') agar bisa ambil data user manapun
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+
+                let bestMatch = null;
+                if (allCache && allCache.length > 0) {
+                    let searchTarget = topic.toLowerCase();
+                    for (let item of allCache) {
+                        let dbTopic = item.trending_topic.toLowerCase();
+                        if (dbTopic === searchTarget || dbTopic.includes(searchTarget) || searchTarget.includes(dbTopic)) {
+                            bestMatch = item;
+                            break;
+                        }
+                    }
+                }
+
+                if (bestMatch) {
+                    setTimeout(async () => {
+                        hideLoading();
+                        showToast("Data instan dari cloud!", "success");
+                        renderResultToDisplay(bestMatch.trending_topic, bestMatch.ai_suggestion, isImage);
+                        
+                        // Jika data ini dari User Lain, kita duplikat ke akun User yang sedang login
+                        if (bestMatch.user_id !== currentUser.id) {
+                            await supabaseClient.from('trends_data').insert([{ 
+                                platform: bestMatch.platform, 
+                                trending_topic: bestMatch.trending_topic, 
+                                ai_suggestion: bestMatch.ai_suggestion,
+                                user_id: currentUser.id 
+                            }]);
+                            fetchHistory();
+                        }
+                        
+                        document.getElementById('input-topic').value = '';
+                    }, 600);
+                    return; 
+                }
+
+                // 2. PANGGIL AI MULTI-MODEL FALLBACK (JIKA CACHE KOSONG)
+                showLoading("Koneksi ke <span>Metan AI Engine</span>...");
+                let prompt = `Berikan analisis tren "${topic}" di ${platform} untuk bisnis ${business}. 
+                Format harus dalam 3 bagian terpisah (jika diminta):
+                1. ANALISIS: Mengapa tren ini viral? (WAJIB)
+                ${isContent ? '2. IDE KONTEN: Berikan 2 ide video viral singkat.' : ''}
+                ${isSales ? '3. STRATEGI JUALAN: Berikan 1 cara promosi diskon/bundling.' : ''}
+                Gunakan bahasa yang lugas, terstruktur, gunakan penomoran jika perlu.`;
+
+                // Daftar Model AI Cadangan
+                // Daftar Model AI Cadangan
+                const fallbackModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                let aiTextResponse = null;
+                let lastErrorMessage = '';
+
+                for (const model of fallbackModels) {
+                    try {
+                        console.log(`Mencoba model AI melalui Server Backend: ${model}...`);
+                        
+                        // KITA TEMBAK KE JEMBATAN KITA SENDIRI (/api/gemini)
+                        const response = await fetch(`/api/gemini`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ prompt: prompt, model: model })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.error) throw new Error(data.error);
+                        if (data.candidates && data.candidates.length > 0) {
+                            aiTextResponse = data.candidates[0].content.parts[0].text;
+                            console.log(`Sukses menggunakan model: ${model}`);
+                            break; // Hentikan loop jika sukses
+                        }
+                    } catch (err) {
+                        console.warn(`Model ${model} gagal/limit. Mencoba cadangan...`);
+                        lastErrorMessage = err.message;
+                    }
+                }
+
+                if (!aiTextResponse) {
+                    throw new Error(`Semua server AI sedang sibuk. ${lastErrorMessage}`);
+                }
+                
+                hideLoading();
+                showToast("Strategi berhasil diracik!", "success");
+                renderResultToDisplay(topic, aiTextResponse, isImage);
+
+                await supabaseClient.from('trends_data').insert([{ 
+                    platform, 
+                    trending_topic: topic, 
+                    ai_suggestion: aiTextResponse,
+                    user_id: currentUser.id 
+                }]);
+                
+                fetchHistory();
+                document.getElementById('input-topic').value = '';
+
+            } catch (e) {
+                console.error('Koneksi Gagal:', e);
+                hideLoading();
+                showToast("Sistem gagal merespon: " + e.message, "error");
+            }
+        }
+
+        async function fetchHistory() {
+            if (!currentUser) return;
+            const { data } = await supabaseClient
+                .from('trends_data')
+                .select('*')
+                .eq('user_id', currentUser.id) // Sidebar hanya memunculkan milik user sendiri
+                .order('created_at', { ascending: false })
+                .limit(20);
+            
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            
+            if (data) {
+                data.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.onclick = () => renderResultToDisplay(item.trending_topic, item.ai_suggestion, false);
+                    historyItem.innerHTML = `
+                        <div class="history-text" title="${item.trending_topic}">
+                            <i class="fa-regular fa-message" style="opacity:0.6; font-size:12px;"></i> 
+                            <span>${item.trending_topic}</span>
+                        </div>
+                        <i class="fa-solid fa-trash delete-btn" onclick="event.stopPropagation(); deleteChat(${item.id})" title="Hapus"></i>
+                    `;
+                    list.appendChild(historyItem);
+                });
+            }
+        }
+
+        async function deleteChat(id) {
+            if(confirm("Yakin ingin menghapus histori ini?")) {
+                await supabaseClient.from('trends_data').delete().eq('id', id);
+                showToast("Histori dihapus", "success");
+                fetchHistory();
+            }
+        }
+    </script>
+</body>
+</html>
