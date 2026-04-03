@@ -8,8 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
     <style>
         :root {
             --bg-dark: #09090b;
@@ -17,7 +15,6 @@
             --card-bg: rgba(255, 255, 255, 0.03);
             --accent-blue: #3b82f6;
             --accent-purple: #a855f7;
-            --accent-green: #10b981;
             --border-color: rgba(255, 255, 255, 0.1);
             --text-main: #fafafa;
             --text-dim: #a1a1aa;
@@ -36,139 +33,397 @@
         }
 
         /* --- TOAST NOTIFICATION --- */
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: rgba(20, 20, 25, 0.95); backdrop-filter: blur(10px); color: white; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-left: 4px solid var(--accent-blue); transform: translateX(120%); animation: slideInToast 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; display: flex; align-items: center; gap: 12px; }
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(20, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-left: 4px solid var(--accent-blue);
+            transform: translateX(120%);
+            animation: slideInToast 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .toast.error { border-left-color: #ef4444; }
         .toast.success { border-left-color: #10b981; }
+
         @keyframes slideInToast { to { transform: translateX(0); } }
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-20px); } }
 
         /* --- AUTH SCREEN --- */
-        #auth-screen { position: fixed; inset: 0; background: radial-gradient(circle at center, #18181b, #09090b); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.5s ease; }
-        .auth-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid var(--border-color); padding: 50px 40px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); animation: floatUp 0.6s ease forwards; }
+        #auth-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #18181b, #09090b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            padding: 50px 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: translateY(20px);
+            animation: floatUp 0.6s ease forwards;
+        }
+
         @keyframes floatUp { to { transform: translateY(0); } }
+
         .auth-card h2 { margin-top: 0; color: var(--text-main); font-size: 28px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .auth-card h2 i { color: var(--accent-blue); }
         .auth-card p { color: var(--text-dim); font-size: 15px; margin-bottom: 35px; }
-        .auth-input { width: 100%; padding: 15px 20px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; border-radius: 12px; outline: none; font-size: 14px; transition: all 0.3s; }
+        
+        .auth-input {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 12px;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
         .auth-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
-        .auth-btn { width: 100%; padding: 15px; background: var(--accent-blue); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; margin-bottom: 15px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
         .auth-btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
         .auth-btn.secondary { background: transparent; border: 1px solid var(--border-color); box-shadow: none; color: var(--text-dim); }
         .auth-btn.secondary:hover { background: rgba(255,255,255,0.05); color: white; transform: translateY(0); }
 
         /* --- APP CONTAINER --- */
         #app-screen { display: none; width: 100%; height: 100%; }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 99; opacity: 0; transition: opacity 0.3s; }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
 
         /* --- SIDEBAR --- */
-        .sidebar { width: 280px; background-color: var(--sidebar-bg); display: flex; flex-direction: column; padding: 20px 0; border-right: 1px solid var(--border-color); flex-shrink: 0; z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sidebar-header { font-size: 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--text-main); padding: 0 20px; }
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+            padding: 0 20px;
+        }
         .sidebar-header i { color: var(--accent-blue); }
-        .new-chat-btn { background: rgba(255,255,255,0.03); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px; border-radius: 12px; margin: 0 20px 20px 20px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
-        .new-chat-btn:hover { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.4); color: var(--accent-blue); }
+
+        .new-chat-btn {
+            background: rgba(255,255,255,0.03);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 12px;
+            margin: 0 20px 20px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .new-chat-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.4);
+            color: var(--accent-blue);
+        }
+
         .history-container { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding: 0 15px; }
+        
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
-        .history-item { padding: 0 12px; height: 48px; border-radius: 12px; margin-bottom: 8px; background: transparent; border: 1px solid transparent; display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; transition: all 0.2s; cursor: pointer; width: 100%; box-sizing: border-box; color: var(--text-dim); }
-        .history-item:hover { border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.05); color: white; }
-        .history-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; margin-right: 10px; display: flex; align-items: center; gap: 10px; max-width: 180px; }
+
+        .history-item {
+            padding: 0 12px;
+            height: 48px; 
+            border-radius: 12px;
+            margin-bottom: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13.5px;
+            transition: all 0.2s;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            color: var(--text-dim);
+        }
+
+        .history-item:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.05);
+            color: white;
+        }
+
+        .history-text {
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            flex-grow: 1;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 180px;
+        }
+
         .delete-btn { color: #ef4444; cursor: pointer; opacity: 0; transition: opacity 0.2s; padding: 5px; }
         .history-item:hover .delete-btn { opacity: 0.7; }
         .delete-btn:hover { opacity: 1 !important; transform: scale(1.1); }
-        .logout-btn { margin: 20px 20px 0 20px; padding: 12px; background: transparent; color: var(--text-dim); border: 1px solid var(--border-color); border-radius: 12px; text-align: center; cursor: pointer; font-size: 13.5px; font-weight: 600; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+
+        .logout-btn {
+            margin: 20px 20px 0 20px;
+            padding: 12px;
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
         .logout-btn:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
 
-        /* --- MAIN CONTENT & HEADER --- */
-        .main-content { flex-grow: 1; display: flex; flex-direction: column; background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent); min-width: 0; position: relative; }
-        .mobile-header { display: none; padding: 15px 20px; align-items: center; border-bottom: 1px solid var(--border-color); background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(10px); z-index: 50; }
+        /* --- MAIN --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent);
+            min-width: 0;
+            position: relative;
+        }
+
+        .mobile-header {
+            display: none;
+            padding: 15px 20px;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 50;
+        }
         .menu-toggle { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; padding: 5px; }
         .mobile-title { font-weight: 600; margin-left: 15px; font-size: 16px; }
 
-        .display-area { flex-grow: 1; overflow-y: auto; padding: 40px 15% 150px 15%; scroll-behavior: smooth; }
-
-        /* --- MODERN SEGMENT CARDS (UI/UX) --- */
-        .result-header-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;}
-        .pdf-btn { background: linear-gradient(135deg, #ef4444, #f97316); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
-        .pdf-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5); }
-
-        .ai-card { 
-            background: #121214; 
-            border-radius: 20px; padding: 30px; margin-bottom: 24px; 
-            animation: cardAppear 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
-            opacity: 0; transform: translateY(20px); 
-            page-break-inside: avoid;
-            break-inside: avoid;
-            display: block;
+        .display-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 40px 15%;
+            scroll-behavior: smooth;
         }
 
-        .card-analisis { border-left: 4px solid var(--text-dim); }
-        .card-konten { border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(to right, rgba(168,85,247,0.05), #121214); }
-        .card-sales { border: 1px dashed rgba(16, 185, 129, 0.5); background: linear-gradient(to right, rgba(16,185,129,0.05), #121214); }
-        .card-visual { border: 1px solid var(--border-color); background: #121214;}
+        .ai-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: cardAppear 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
 
         @keyframes cardAppear { to { opacity: 1; transform: translateY(0); } }
 
-        .section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
-        .card-analisis .section-title { color: var(--text-main); }
-        .card-konten .section-title { color: var(--accent-purple); }
-        .card-sales .section-title { color: var(--accent-green); }
-        .card-visual .section-title { color: var(--accent-blue); }
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 12px;
+        }
 
-        .content-body { line-height: 1.7; color: #e4e4e7; font-size: 15.5px; word-wrap: break-word; }
-        .content-body strong { color: #ffffff; font-weight: 600; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;}
-        .content-body ul { margin: 15px 0; padding-left: 20px; list-style-type: '⚡  '; }
-        .content-body li { margin-bottom: 12px; padding-left: 5px; }
+        .content-body { line-height: 1.8; color: #d1d1d6; font-size: 15.5px; }
+        .content-body strong { color: #ffffff; font-weight: 600; }
+        .content-body ul { margin: 12px 0; padding-left: 20px; }
+        .content-body li { margin-bottom: 10px; padding-left: 5px; }
 
         /* --- INPUT AREA & TOGGLES --- */
-        .input-box { padding: 20px 15% 40px; background: linear-gradient(to top, var(--bg-dark) 80%, transparent); position: absolute; bottom: 0; width: 100%; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40;}
-        .drag-handle { display: none; width: 100%; text-align: center; padding: 10px 0; cursor: pointer; margin-top: -15px; margin-bottom: 5px;}
-        .drag-handle span { display: inline-block; width: 50px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 5px; transition: background 0.3s; }
-        .drag-handle:hover span { background: var(--accent-blue); }
+        .input-box {
+            padding: 20px 15% 40px;
+            background: linear-gradient(to top, var(--bg-dark) 80%, transparent);
+            position: relative;
+        }
 
         .feature-toggles { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-        .toggle-btn { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-dim); padding: 10px 18px; border-radius: 30px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; }
+        .toggle-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-dim);
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
         .toggle-btn:hover { background: rgba(255,255,255,0.08); color: white; }
-        
-        #toggle-content.active { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border-color: rgba(168, 85, 247, 0.4); }
-        #toggle-sales.active { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.4); }
-        #toggle-image.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.4); }
+        .toggle-btn.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
 
-        .input-wrapper { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; padding: 10px 10px 10px 25px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); transition: border 0.3s, box-shadow 0.3s; }
+        .input-wrapper {
+            background: rgba(24, 24, 27, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 10px 10px 10px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            transition: border 0.3s, box-shadow 0.3s;
+        }
         .input-wrapper:focus-within { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15); }
+
         .input-wrapper input { flex-grow: 1; background: transparent; border: none; color: white; font-size: 15px; outline: none; }
         .input-wrapper input::placeholder { color: #52525b; }
+        
         select#input-platform { background:transparent; color:var(--accent-blue); border:none; outline:none; font-size:14px; font-weight:600; cursor:pointer; }
         select#input-platform option { background: var(--bg-dark); color: white; }
 
-        .action-btn { background: var(--accent-blue); color: white; border: none; padding: 12px 24px; border-radius: 14px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+        .action-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         .action-btn:hover { background: #2563eb; transform: scale(1.05); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
 
         /* --- FUTURISTIC LOADER --- */
-        .loading-overlay { display: none; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); background: rgba(24, 24, 27, 0.9); border: 1px solid var(--border-color); padding: 12px 24px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); align-items: center; gap: 15px; z-index: 10; }
-        .spinner { width: 20px; height: 20px; border: 3px solid rgba(59, 130, 246, 0.3); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: -60px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(24, 24, 27, 0.9);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+        }
+        .spinner {
+            width: 20px; height: 20px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
         .loading-text { font-size: 13.5px; font-weight: 500; color: var(--text-main); }
         .loading-text span { color: var(--accent-blue); animation: pulse 1.5s infinite; }
+
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
+        /* --- MOBILE RESPONSIVE --- */
         @media (max-width: 768px) {
             .mobile-header { display: flex; }
             .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; }
             .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
             .sidebar-overlay.active { display: block; opacity: 1; }
-            .display-area { padding: 30px 5% 150px 5%; }
-            .input-box { padding: 5px 5% 20px 5%; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(9,9,11,0.95); backdrop-filter: blur(10px);}
-            .drag-handle { display: block; }
-            .input-box.minimized { transform: translateY(calc(100% - 35px)); }
-            .input-box.minimized .feature-toggles, .input-box.minimized #input-platform, .input-box.minimized #input-business { display: none !important; }
-            .input-box.minimized .input-wrapper { border-radius: 30px; box-shadow: none; border-color: transparent; background: transparent; padding: 0;}
-            .input-box.minimized .action-btn { display: none; }
+            
+            .display-area { padding: 30px 5%; }
+            .input-box { padding: 15px 5% 30px; }
             .input-wrapper { flex-wrap: wrap; padding: 15px; border-radius: 16px; }
             .input-wrapper input[type="text"] { min-width: 100%; border-left: none !important; padding-left: 0 !important; margin-top: 5px; }
             .action-btn { width: 100%; justify-content: center; margin-top: 10px; }
+            .feature-toggles { justify-content: center; }
+            
+            .loading-overlay { top: -80px; width: 90%; justify-content: center; }
         }
     </style>
 </head>
@@ -181,9 +436,9 @@
             <h2><i class="fa-solid fa-bolt"></i> Metan AI</h2>
             <p>Ruang kerja pintar untuk pertumbuhan bisnismu</p>
             <input type="email" id="auth-email" class="auth-input" placeholder="Alamat Email">
-            <input type="password" id="auth-password" class="auth-input" placeholder="Password">
+            <input type="password" id="auth-password" class="auth-input" placeholder="Password rahasia">
             <button class="auth-btn" onclick="login()">Masuk ke Sistem</button>
-            <button class="auth-btn secondary" onclick="register()">Daftar Akun Baru</button>
+            <button class="auth-btn secondary" onclick="register()">Buat Akun Baru</button>
         </div>
     </div>
 
@@ -209,19 +464,17 @@
                 <div class="mobile-title">Metan Intelligence</div>
             </div>
 
-            <div class="display-area" id="display-area" onclick="minimizePanel()">
+            <div class="display-area" id="display-area">
                 <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.8s ease;">
                     <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
                     <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Metan Intelligence.</h1>
                     <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
-                        Tentukan tren, <strong>pilih fitur yang kamu butuhkan saja</strong>, dan dapatkan strategi pemasaran instan ala Gen-Z.
+                        Tentukan tren yang sedang hangat, pilih mode analisis, dan dapatkan strategi pemasaran instan.
                     </p>
                 </div>
             </div>
 
-            <div class="input-box" id="input-box">
-                <div class="drag-handle" onclick="togglePanel()"><span></span></div>
-                
+            <div class="input-box">
                 <div class="loading-overlay" id="loading-overlay">
                     <div class="spinner"></div>
                     <div class="loading-text" id="loading-text">Memproses...</div>
@@ -232,14 +485,14 @@
                         <i class="fa-solid fa-video"></i> Ide Konten
                     </button>
                     <button class="toggle-btn active" id="toggle-sales" onclick="this.classList.toggle('active')">
-                        <i class="fa-solid fa-tags"></i> Strategi Jualan
+                        <i class="fa-solid fa-chart-line"></i> Strategi Jualan
                     </button>
                     <button class="toggle-btn" id="toggle-image" onclick="this.classList.toggle('active')">
                         <i class="fa-solid fa-image"></i> Visual AI
                     </button>
                 </div>
 
-                <div class="input-wrapper" onclick="maximizePanel()">
+                <div class="input-wrapper">
                     <select id="input-platform">
                         <option value="TikTok">TikTok</option>
                         <option value="Instagram">Instagram</option>
@@ -247,7 +500,7 @@
                     </select>
                     <input type="text" id="input-topic" placeholder="Ketik topik tren (misal: Roti Lumer)..." autocomplete="off">
                     <input type="text" id="input-business" placeholder="Merek Bisnismu" style="width: 140px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 15px;" autocomplete="off">
-                    <button class="action-btn" onclick="processAnalysis(event)">
+                    <button class="action-btn" onclick="processAnalysis()">
                         Generate <i class="fa-solid fa-wand-magic-sparkles"></i>
                     </button>
                 </div>
@@ -255,19 +508,16 @@
         </div>
     </div>
 
-    <div id="pdf-secret-container" style="position: absolute; left: -9999px; top: 0; width: 800px; background-color: #09090b; color: #fafafa; padding: 30px; box-sizing: border-box; z-index: -1;"></div>
-
     <script>
         const supabaseUrl = 'https://cidccxpjstqnpisuxkcm.supabase.co'; 
         const supabaseKey = 'sb_publishable_CM0leWbXShfwZ9riFphpYQ_r7kRQUPm'; 
-        
-        // --- API KEY GROQ (HANIF) ---
-        const groqApiKey = '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'; 
-
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
         let currentUser = null;
 
-        // UI HELPERS
+        // ==========================================
+        // UI HELPERS 
+        // ==========================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -286,20 +536,7 @@
             document.getElementById('sidebar-overlay').classList.toggle('active');
         }
 
-        function togglePanel() {
-            document.getElementById('input-box').classList.toggle('minimized');
-        }
-        function minimizePanel() {
-            if(window.innerWidth <= 768 && document.getElementById('welcome-msg') == null) {
-                document.getElementById('input-box').classList.add('minimized');
-            }
-        }
-        function maximizePanel() {
-            document.getElementById('input-box').classList.remove('minimized');
-        }
-
         function showLoading(message) {
-            maximizePanel(); 
             const overlay = document.getElementById('loading-overlay');
             const text = document.getElementById('loading-text');
             text.innerHTML = message;
@@ -310,6 +547,7 @@
             document.getElementById('loading-overlay').style.display = 'none';
         }
 
+        // FUNGSI TOPIK BARU
         function startNewChat() {
             const displayArea = document.getElementById('display-area');
             displayArea.innerHTML = `
@@ -317,19 +555,21 @@
                     <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
                     <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Metan Intelligence.</h1>
                     <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
-                        Tentukan tren, <strong>pilih fitur yang kamu butuhkan saja</strong>, dan dapatkan strategi pemasaran instan ala Gen-Z.
+                        Tentukan tren yang sedang hangat, pilih mode analisis, dan dapatkan strategi pemasaran instan.
                     </p>
                 </div>
             `;
             document.getElementById('input-topic').value = '';
-            maximizePanel();
             document.getElementById('input-topic').focus();
+            
             if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
                 toggleSidebar();
             }
         }
 
-        // AUTH SYSTEM
+        // ==========================================
+        // SISTEM AUTENTIKASI
+        // ==========================================
         supabaseClient.auth.onAuthStateChange((event, session) => {
             if (session) {
                 currentUser = session.user;
@@ -337,6 +577,7 @@
                 setTimeout(() => {
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('app-screen').style.display = 'flex';
+                    showToast('Selamat datang kembali!', 'success');
                     fetchHistory();
                 }, 400);
             } else {
@@ -350,7 +591,8 @@
         async function register() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            if (!email || password.length < 6) { showToast("Email wajib diisi & password min 6 char!", "error"); return; }
+            if (!email || password.length < 6) { showToast("Email wajib diisi dan password minimal 6 karakter!", "error"); return; }
+            
             const { data, error } = await supabaseClient.auth.signUp({ email, password });
             if (error) { showToast(error.message, "error"); } 
             else { if(!data.session) showToast("Akun dibuat! Mencoba masuk...", "success"); }
@@ -360,44 +602,19 @@
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             if (!email || !password) { showToast("Lengkapi form login!", "error"); return; }
-            const { error } = await supabaseClient.auth.signInWithPassword({ email: e, password: p });
+
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) { showToast("Kredensial tidak valid!", "error"); }
         }
 
-        async function logout() { await supabaseClient.auth.signOut(); location.reload(); }
-
-        // PDF EXPORT SYSTEM (ANTI BLANK)
-        function downloadPDF(topicName) {
-            showToast("Menyiapkan dokumen PDF...", "success");
-            const sourceHTML = document.getElementById('export-content').innerHTML;
-            const secretContainer = document.getElementById('pdf-secret-container');
-            secretContainer.innerHTML = sourceHTML;
-            const cards = secretContainer.querySelectorAll('.ai-card');
-            cards.forEach(card => {
-                card.style.transform = 'none';
-                card.style.animation = 'none';
-                card.style.pageBreakInside = 'avoid';
-                card.style.breakInside = 'avoid';
-                card.style.marginBottom = '20px';
-                card.style.border = '1px solid rgba(255,255,255,0.1)';
-            });
-            const opt = {
-                margin: 15,
-                filename: `MetanAI_Report_${topicName.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#09090b', windowWidth: 800 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(secretContainer).save().then(() => {
-                showToast("PDF Berhasil Diunduh!", "success");
-                secretContainer.innerHTML = ''; 
-            }).catch(err => {
-                showToast("Gagal memproses PDF", "error");
-                secretContainer.innerHTML = '';
-            });
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            showToast("Berhasil keluar dari sistem.", "success");
         }
 
-        // PARSER & UI RENDERER
+        // ==========================================
+        // SISTEM METAN AI & GLOBAL CACHE
+        // ==========================================
         function formatMarkdown(text) {
             let formatted = text;
             formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -409,180 +626,203 @@
             return formatted;
         }
 
-        function extractSection(text, tag) {
-            const regex = new RegExp(`\\${tag}([\\s\\S]*?)(?=\\[|$)`, 'i');
-            const match = text.match(regex);
-            return match ? match[1].trim() : '';
-        }
-
-        function renderResultToDisplay(topic, aiText, isHistoryClick = false) {
+        function renderResultToDisplay(topic, aiText, showImage = false) {
             const displayArea = document.getElementById('display-area');
             const welcomeMsg = document.getElementById('welcome-msg');
             if (welcomeMsg) welcomeMsg.style.display = 'none';
 
-            const toggleContent = document.getElementById('toggle-content').classList.contains('active');
-            const toggleSales = document.getElementById('toggle-sales').classList.contains('active');
-            const toggleImage = document.getElementById('toggle-image').classList.contains('active');
-
-            const showAnalisis = true; 
-            const showKonten = isHistoryClick ? aiText.includes('[KONTEN]') : toggleContent;
-            const showJualan = isHistoryClick ? aiText.includes('[JUALAN]') : toggleSales;
-            const showVisual = isHistoryClick ? aiText.includes('[IMAGEPROMPT]') : toggleImage;
-            
-            const dateStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-            let resultHtml = `
-                <div class="result-header-wrapper">
-                    <h2 style="color:white; font-size:32px; margin: 0; letter-spacing: -0.5px;"># ${topic}</h2>
-                    <button class="pdf-btn" onclick="downloadPDF('${topic}')"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
-                </div>
-                <div id="export-content" style="padding: 10px 0; color: #fafafa; width: 100%;">
-                    <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px;">
-                        <h3 style="color: var(--accent-blue); margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-bolt"></i> Metan Intelligence Report
-                        </h3>
-                        <p style="color: var(--text-dim); font-size: 13px; margin: 0;">Topik Analisis: <strong style="color:white;">${topic}</strong> &nbsp;|&nbsp; Tanggal: ${dateStr}</p>
-                    </div>
-            `;
-            
+            const parts = aiText.split(/\d\./);
+            let resultHtml = `<div style="margin-bottom:40px;"><h2 style="color:white; font-size:32px; margin-bottom: 30px; letter-spacing: -0.5px;"># ${topic}</h2>`;
             let delay = 0;
-            if (aiText.includes('[ANALISIS]') && showAnalisis) {
-                let text = formatMarkdown(extractSection(aiText, '[ANALISIS]'));
-                resultHtml += `<div class="ai-card card-analisis" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Analisis Singkat</div><div class="content-body">${text}</div></div>`;
-                delay += 0.15;
-            }
-            if (aiText.includes('[KONTEN]') && showKonten) {
-                let text = formatMarkdown(extractSection(aiText, '[KONTEN]'));
-                resultHtml += `<div class="ai-card card-konten" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-video"></i> Ide Konten Viral</div><div class="content-body">${text}</div></div>`;
-                delay += 0.15;
-            }
-            if (aiText.includes('[JUALAN]') && showJualan) {
-                let text = formatMarkdown(extractSection(aiText, '[JUALAN]'));
-                resultHtml += `<div class="ai-card card-sales" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-tags"></i> Strategi Konversi / Promo</div><div class="content-body">${text}</div></div>`;
-                delay += 0.15;
-            }
 
-            if (showVisual && aiText.includes('[IMAGEPROMPT]')) {
-                let cleanTopic = topic.replace(/[^a-zA-Z0-9\s]/g, '').trim(); 
-                let safePrompt = encodeURIComponent(cleanTopic + " aesthetic modern minimalist high quality");
-                let randomSeed = Math.floor(Math.random() * 100000);
-                let imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=450&nologo=true&seed=${randomSeed}`;
-                let loaderId = 'img-loader-' + Math.random().toString(36).substr(2, 9);
-                let cssFallback = `document.getElementById('${loaderId}').innerHTML='<i class=\\'fa-solid fa-image\\' style=\\'font-size:30px; color:#3b82f6; opacity:0.5; margin-bottom:10px;\\'></i><span style=\\'color:white; font-weight:600;\\'>Visual: ${topic}</span>'; this.style.display='none';`;
+            parts.forEach((p, index) => {
+                if(p.trim().length < 5) return;
+                let title = index === 1 ? "Analisis Pasar" : index === 2 ? "Ide Konten Viral" : "Strategi Konversi";
+                let icon = index === 1 ? "fa-magnifying-glass-chart" : index === 2 ? "fa-clapperboard" : "fa-money-bill-trend-up";
+                let cleanedText = formatMarkdown(p.trim());
 
                 resultHtml += `
-                    <div class="ai-card card-visual" style="animation-delay: ${delay}s">
-                        <div class="section-title"><i class="fa-solid fa-image"></i> AI Visualisasi (Prototype)</div>
-                        <div style="position: relative; width: 100%; min-height: 250px; background: #1e1e24; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-top: 10px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden;">
-                            <div id="${loaderId}" style="position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 1;">
-                                <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--accent-blue);"></i>
-                                <span style="color: var(--text-dim); font-size: 13px;">Memuat visual untuk: ${topic}</span>
-                            </div>
-                            <img src="${imgUrl}" onload="document.getElementById('${loaderId}').style.display='none'; this.style.opacity=1;" onerror="${cssFallback}" style="position: relative; z-index: 2; width: 100%; border-radius: 14px; object-fit: cover; opacity: 0; transition: opacity 0.5s;">
-                        </div>
+                    <div class="ai-card" style="animation-delay: ${delay}s">
+                        <div class="section-title"><i class="fa-solid ${icon}"></i> ${title}</div>
+                        <div class="content-body">${cleanedText}</div>
+                    </div>
+                `;
+                delay += 0.15;
+            });
+
+            if(showImage) {
+                resultHtml += `
+                    <div class="ai-card" style="animation-delay: ${delay}s">
+                        <div class="section-title"><i class="fa-solid fa-image"></i> Referensi Visual</div>
+                        <img src="https://source.unsplash.com/800x450/?${topic},food,aesthetic" style="width:100%; border-radius:14px; margin-top:10px; border: 1px solid rgba(255,255,255,0.05); object-fit: cover;">
                     </div>
                 `;
             }
 
-            resultHtml += `</div>`; 
+            resultHtml += `</div>`;
             displayArea.innerHTML = resultHtml; 
-            setTimeout(() => {
-                displayArea.scrollTo({ top: displayArea.scrollHeight, behavior: 'smooth' });
-                minimizePanel();
-            }, 300);
+            displayArea.scrollTop = 0;
+            
             if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
                 toggleSidebar();
             }
         }
 
-        // MAIN GROQ ENGINE
-        async function processAnalysis(e) {
-            if(e) e.stopPropagation(); 
+        async function processAnalysis() {
             if (!currentUser) { showToast("Sesi habis, silakan login kembali.", "error"); return; }
 
             const topic = document.getElementById('input-topic').value.trim();
             const business = document.getElementById('input-business').value || 'UMKM F&B';
             const platform = document.getElementById('input-platform').value;
-            if (!topic) return showToast("Masukkan topik tren!", "error");
+            const isContent = document.getElementById('toggle-content').classList.contains('active');
+            const isSales = document.getElementById('toggle-sales').classList.contains('active');
+            const isImage = document.getElementById('toggle-image').classList.contains('active');
+
+            if (!topic) { showToast("Masukkan topik tren terlebih dahulu!", "error"); return; }
 
             try {
+                // 1. CEK GLOBAL CACHE (SEMUA USER)
                 showLoading("Menyisir <span>database global</span>...");
-                const { data: allCache } = await supabaseClient.from('trends_data').select('*').eq('platform', platform).order('created_at', { ascending: false });
+                const { data: allCache } = await supabaseClient
+                    .from('trends_data')
+                    .select('*')
+                    .eq('platform', platform)
+                    // Tidak pakai eq('user_id') agar bisa ambil data user manapun
+                    .order('created_at', { ascending: false })
+                    .limit(100);
 
-                let existingEntry = null;
-                if (allCache) {
-                    let target = topic.toLowerCase();
-                    existingEntry = allCache.find(i => i.trending_topic.toLowerCase().includes(target) || target.includes(i.trending_topic.toLowerCase()));
+                let bestMatch = null;
+                if (allCache && allCache.length > 0) {
+                    let searchTarget = topic.toLowerCase();
+                    for (let item of allCache) {
+                        let dbTopic = item.trending_topic.toLowerCase();
+                        if (dbTopic === searchTarget || dbTopic.includes(searchTarget) || searchTarget.includes(dbTopic)) {
+                            bestMatch = item;
+                            break;
+                        }
+                    }
                 }
 
-                if (existingEntry) {
-                    hideLoading();
-                    showToast("Data dimuat dari Database Global!", "success");
-                    renderResultToDisplay(existingEntry.trending_topic, existingEntry.ai_suggestion, false);
-                    if (existingEntry.user_id !== currentUser.id) {
-                        await supabaseClient.from('trends_data').insert([{ platform: existingEntry.platform, trending_topic: existingEntry.trending_topic, ai_suggestion: existingEntry.ai_suggestion, user_id: currentUser.id }]);
-                        fetchHistory();
-                    }
-                    document.getElementById('input-topic').value = '';
+                if (bestMatch) {
+                    setTimeout(async () => {
+                        hideLoading();
+                        showToast("Data instan dari cloud!", "success");
+                        renderResultToDisplay(bestMatch.trending_topic, bestMatch.ai_suggestion, isImage);
+                        
+                        // Jika data ini dari User Lain, kita duplikat ke akun User yang sedang login
+                        if (bestMatch.user_id !== currentUser.id) {
+                            await supabaseClient.from('trends_data').insert([{ 
+                                platform: bestMatch.platform, 
+                                trending_topic: bestMatch.trending_topic, 
+                                ai_suggestion: bestMatch.ai_suggestion,
+                                user_id: currentUser.id 
+                            }]);
+                            fetchHistory();
+                        }
+                        
+                        document.getElementById('input-topic').value = '';
+                    }, 600);
                     return; 
                 }
 
-                showLoading("Koneksi ke <span>Llama 3 Engine</span>...");
-                const prompt = `Kamu pakar marketing Gen-Z. Analisis tren "${topic}" di ${platform} untuk bisnis: ${business}.
-                Wajib format TAG KOTAK:
-                [ANALISIS] (Singkat kenapa viral)
-                [KONTEN] (2 ide video gaul)
-                [JUALAN] (1 promo FOMO)
-                [IMAGEPROMPT] OK.
-                Gunakan gaya bahasa santai dan impactfull.`;
+                // 2. PANGGIL AI MULTI-MODEL FALLBACK (JIKA CACHE KOSONG)
+                showLoading("Koneksi ke <span>Metan AI Engine</span>...");
+                let prompt = `Berikan analisis tren "${topic}" di ${platform} untuk bisnis ${business}. 
+                Format harus dalam 3 bagian terpisah (jika diminta):
+                1. ANALISIS: Mengapa tren ini viral? (WAJIB)
+                ${isContent ? '2. IDE KONTEN: Berikan 2 ide video viral singkat.' : ''}
+                ${isSales ? '3. STRATEGI JUALAN: Berikan 1 cara promosi diskon/bundling.' : ''}
+                Gunakan bahasa yang lugas, terstruktur, gunakan penomoran jika perlu.`;
 
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
-                        messages: [{ role: "user", content: prompt }]
-                    })
-                });
+                // Daftar Model AI Cadangan
+                // Daftar Model AI Cadangan
+                const fallbackModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-pro'];
+                let aiTextResponse = null;
+                let lastErrorMessage = '';
 
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
+                for (const model of fallbackModels) {
+                    try {
+                        console.log(`Mencoba model AI melalui Server Backend: ${model}...`);
+                        
+                        // KITA TEMBAK KE JEMBATAN KITA SENDIRI (/api/gemini)
+                        const response = await fetch(`/api/gemini`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ prompt: prompt, model: model })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.error) throw new Error(data.error);
+                        if (data.candidates && data.candidates.length > 0) {
+                            aiTextResponse = data.candidates[0].content.parts[0].text;
+                            console.log(`Sukses menggunakan model: ${model}`);
+                            break; // Hentikan loop jika sukses
+                        }
+                    } catch (err) {
+                        console.warn(`Model ${model} gagal/limit. Mencoba cadangan...`);
+                        lastErrorMessage = err.message;
+                    }
+                }
 
-                const aiResponse = data.choices[0].message.content;
+                if (!aiTextResponse) {
+                    throw new Error(`Semua server AI sedang sibuk. ${lastErrorMessage}`);
+                }
+                
                 hideLoading();
-                showToast("Strategi selesai diracik!", "success");
-                renderResultToDisplay(topic, aiResponse, false);
+                showToast("Strategi berhasil diracik!", "success");
+                renderResultToDisplay(topic, aiTextResponse, isImage);
 
-                await supabaseClient.from('trends_data').insert([{ platform, trending_topic: topic, ai_suggestion: aiResponse, user_id: currentUser.id }]);
+                await supabaseClient.from('trends_data').insert([{ 
+                    platform, 
+                    trending_topic: topic, 
+                    ai_suggestion: aiTextResponse,
+                    user_id: currentUser.id 
+                }]);
+                
                 fetchHistory();
                 document.getElementById('input-topic').value = '';
 
             } catch (e) {
-                console.error(e);
+                console.error('Koneksi Gagal:', e);
                 hideLoading();
-                showToast("Sistem sibuk: " + e.message, "error");
+                showToast("Sistem gagal merespon: " + e.message, "error");
             }
         }
 
         async function fetchHistory() {
             if (!currentUser) return;
-            const { data } = await supabaseClient.from('trends_data').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(15);
+            const { data } = await supabaseClient
+                .from('trends_data')
+                .select('*')
+                .eq('user_id', currentUser.id) // Sidebar hanya memunculkan milik user sendiri
+                .order('created_at', { ascending: false })
+                .limit(20);
+            
             const list = document.getElementById('history-list');
             list.innerHTML = '';
+            
             if (data) {
                 data.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'history-item';
-                    div.innerHTML = `<div class="history-text" title="${item.trending_topic}"><i class="fa-regular fa-comment"></i> <span>${item.trending_topic}</span></div><i class="fa-solid fa-trash delete-btn" onclick="event.stopPropagation(); deleteChat(${item.id})"></i>`;
-                    div.onclick = () => renderResultToDisplay(item.trending_topic, item.ai_suggestion, true);
-                    list.appendChild(div);
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.onclick = () => renderResultToDisplay(item.trending_topic, item.ai_suggestion, false);
+                    historyItem.innerHTML = `
+                        <div class="history-text" title="${item.trending_topic}">
+                            <i class="fa-regular fa-message" style="opacity:0.6; font-size:12px;"></i> 
+                            <span>${item.trending_topic}</span>
+                        </div>
+                        <i class="fa-solid fa-trash delete-btn" onclick="event.stopPropagation(); deleteChat(${item.id})" title="Hapus"></i>
+                    `;
+                    list.appendChild(historyItem);
                 });
             }
         }
 
         async function deleteChat(id) {
-            if(confirm("Hapus histori?")) {
+            if(confirm("Yakin ingin menghapus histori ini?")) {
                 await supabaseClient.from('trends_data').delete().eq('id', id);
+                showToast("Histori dihapus", "success");
                 fetchHistory();
             }
         }
