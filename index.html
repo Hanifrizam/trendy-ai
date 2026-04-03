@@ -754,18 +754,47 @@
                     // Simpan balasan AI ke memory
                     chatContextHistory.push({ role: "assistant", content: aiTextResponse });
 
-                    // Gabung Cache + AI Baru
-                    let newAnalisis = aiTextResponse.includes('[ANALISIS]') ? extractSection(aiTextResponse, '[ANALISIS]') : (aiTextResponse.includes('[') ? '' : aiTextResponse); // Fallback natural text
-                    let newResearch = aiTextResponse.includes('[RESEARCH]') ? extractSection(aiTextResponse, '[RESEARCH]') : '';
-                    let newKonten = aiTextResponse.includes('[KONTEN]') ? extractSection(aiTextResponse, '[KONTEN]') : '';
-                    let newJualan = aiTextResponse.includes('[JUALAN]') ? extractSection(aiTextResponse, '[JUALAN]') : '';
-                    let newImage = aiTextResponse.includes('[IMAGEPROMPT]') ? extractSection(aiTextResponse, '[IMAGEPROMPT]') : '';
+                   // --- PARSING SUPER AMAN (ANTI-BLANK) ---
+                    let newAnalisis = '';
+                    let newResearch = '';
+                    let newKonten = '';
+                    let newJualan = '';
+                    let newImage = '';
+
+                    // Cek apakah AI mematuhi format tag resmi kita
+                    const hasOfficialTags = aiTextResponse.includes('[ANALISIS]') || aiTextResponse.includes('[KONTEN]') || aiTextResponse.includes('[JUALAN]') || aiTextResponse.includes('[RESEARCH]');
+
+                    if (hasOfficialTags) {
+                        newAnalisis = aiTextResponse.includes('[ANALISIS]') ? extractSection(aiTextResponse, '[ANALISIS]') : '';
+                        newResearch = aiTextResponse.includes('[RESEARCH]') ? extractSection(aiTextResponse, '[RESEARCH]') : '';
+                        newKonten = aiTextResponse.includes('[KONTEN]') ? extractSection(aiTextResponse, '[KONTEN]') : '';
+                        newJualan = aiTextResponse.includes('[JUALAN]') ? extractSection(aiTextResponse, '[JUALAN]') : '';
+                        newImage = aiTextResponse.includes('[IMAGEPROMPT]') ? extractSection(aiTextResponse, '[IMAGEPROMPT]') : '';
+                        
+                        // Fallback: Jika AI kasih intro text sebelum tag
+                        if (!newAnalisis && aiTextResponse.indexOf('[') > 0) {
+                            newAnalisis = aiTextResponse.substring(0, aiTextResponse.indexOf('[')).trim();
+                        }
+                    } else {
+                        // JIKA AI MENJAWAB NATURAL (Sering terjadi di obrolan lanjutan)
+                        // Kita dump jawaban naturalnya ke dalam Card yang sedang diaktifkan user
+                        if (isContent && !isSales && !isResearch) {
+                            newKonten = aiTextResponse;
+                        } else if (isSales && !isContent && !isResearch) {
+                            newJualan = aiTextResponse;
+                        } else if (isResearch && !isContent && !isSales) {
+                            newResearch = aiTextResponse;
+                        } else {
+                            newAnalisis = aiTextResponse; // Default dump
+                        }
+                    }
 
                     if (existingData.analisis || newAnalisis) finalAiResponse += `\n[ANALISIS]\n${existingData.analisis || newAnalisis}\n`;
                     if (existingData.research || newResearch) finalAiResponse += `\n[RESEARCH]\n${existingData.research || newResearch}\n`;
                     if (existingData.konten || newKonten) finalAiResponse += `\n[KONTEN]\n${existingData.konten || newKonten}\n`;
                     if (existingData.jualan || newJualan) finalAiResponse += `\n[JUALAN]\n${existingData.jualan || newJualan}\n`;
                     if (existingData.imageprompt || newImage) finalAiResponse += `\n[IMAGEPROMPT]\n${existingData.imageprompt || newImage}\n`;
+                    // --- AKHIR PARSING ---
                     
                     showToast(`Dibalas oleh ${aiResult.source}!`, "success");
                 }
