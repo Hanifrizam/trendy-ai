@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metan AI - Trend Intelligence</title>
+    <title>Trendy AI - Trend Intelligence</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,6 +18,7 @@
             --accent-blue: #3b82f6;
             --accent-purple: #a855f7;
             --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
             --border-color: rgba(255, 255, 255, 0.1);
             --text-main: #fafafa;
             --text-dim: #a1a1aa;
@@ -113,6 +114,7 @@
         .card-analisis { border-left: 4px solid var(--text-dim); }
         .card-konten { border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(to right, rgba(168,85,247,0.05), #121214); }
         .card-sales { border: 1px dashed rgba(16, 185, 129, 0.5); background: linear-gradient(to right, rgba(16,185,129,0.05), #121214); }
+        .card-research { border: 1px solid rgba(245, 158, 11, 0.3); background: linear-gradient(to right, rgba(245,158,11,0.05), #121214); }
         .card-visual { border: 1px solid var(--border-color); background: #121214;}
 
         @keyframes cardAppear { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -121,6 +123,7 @@
         .card-analisis .section-title { color: var(--text-main); }
         .card-konten .section-title { color: var(--accent-purple); }
         .card-sales .section-title { color: var(--accent-green); }
+        .card-research .section-title { color: var(--accent-yellow); }
         .card-visual .section-title { color: var(--accent-blue); }
 
         .content-body { line-height: 1.8; color: #e4e4e7; font-size: 15px; word-wrap: break-word; }
@@ -144,6 +147,7 @@
         
         #toggle-content.active { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border-color: rgba(168, 85, 247, 0.4); }
         #toggle-sales.active { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.4); }
+        #toggle-research.active { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); border-color: rgba(245, 158, 11, 0.4); }
         #toggle-image.active { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.4); }
 
         .input-wrapper { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; padding: 10px 10px 10px 25px; display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); transition: border 0.3s, box-shadow 0.3s; }
@@ -193,7 +197,7 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h2><i class="fa-solid fa-bolt"></i> Metan AI</h2>
+            <h2><i class="fa-solid fa-bolt"></i> Trendy AI</h2>
             <p>Ruang kerja cerdas untuk riset pasar. Silakan isi data sesi Anda.</p>
             
             <input type="text" id="guest-name" class="auth-input" placeholder="Nama Lengkap / Panggilan" required>
@@ -215,7 +219,7 @@
 
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <i class="fa-solid fa-bolt"></i> Metan AI
+                <i class="fa-solid fa-bolt"></i> Trendy AI
             </div>
 
             <div class="guest-profile">
@@ -224,7 +228,7 @@
             </div>
             
             <button class="new-chat-btn" onclick="startNewChat()">
-                <i class="fa-solid fa-plus"></i> Hapus Layar
+                <i class="fa-solid fa-plus"></i> Topik Baru
             </button>
 
             <div class="history-container" id="history-list"></div>
@@ -234,13 +238,13 @@
         <div class="main-content">
             <div class="mobile-header">
                 <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
-                <div class="mobile-title">Metan Intelligence</div>
+                <div class="mobile-title">Trendy Intelligence</div>
             </div>
 
             <div class="display-area" id="display-area" onclick="minimizePanel()">
                 <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.8s ease;">
                     <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
-                    <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Metan Intelligence.</h1>
+                    <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Trendy Intelligence.</h1>
                     <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
                         Tentukan tren, <strong>pilih fitur yang kamu butuhkan saja</strong>, dan dapatkan strategi pemasaran instan ala Gen-Z.
                     </p>
@@ -261,6 +265,9 @@
                     </button>
                     <button class="toggle-btn active" id="toggle-sales" onclick="this.classList.toggle('active')">
                         <i class="fa-solid fa-tags"></i> Strategi Jualan
+                    </button>
+                    <button class="toggle-btn" id="toggle-research" onclick="this.classList.toggle('active')">
+                        <i class="fa-solid fa-chart-line"></i> Research Penjualan
                     </button>
                     <button class="toggle-btn" id="toggle-image" onclick="this.classList.toggle('active')">
                         <i class="fa-solid fa-image"></i> Visual AI
@@ -354,23 +361,32 @@
         }
 
         function startNewChat() {
-            // Bersihkan area display agar bisa prompt lagi dengan bersih
+            // Bersihkan area display agar bisa prompt lagi dengan bersih, scroll ke bawah setelah diklik
             const displayArea = document.getElementById('display-area');
-            displayArea.innerHTML = `
-                <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.5s ease;">
-                    <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
-                    <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Metan Intelligence.</h1>
-                    <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
-                        Tentukan tren, <strong>pilih fitur yang kamu butuhkan saja</strong>, dan dapatkan strategi pemasaran instan ala Gen-Z.
-                    </p>
-                </div>
-            `;
+            const welcomeMsg = document.getElementById('welcome-msg');
+            
+            // JIKA ini sedang melihat riwayat, kita sembunyikan semua riwayat (membuatnya blank baru)
+            if(!welcomeMsg) {
+                displayArea.innerHTML = `
+                    <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.8s ease;">
+                        <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
+                        <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Trendy Intelligence.</h1>
+                        <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
+                            Tentukan tren, <strong>pilih fitur yang kamu butuhkan saja</strong>, dan dapatkan strategi pemasaran instan ala Gen-Z.
+                        </p>
+                    </div>
+                `;
+            }
+            
             document.getElementById('input-topic').value = '';
             maximizePanel();
             document.getElementById('input-topic').focus();
             if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
                 toggleSidebar();
             }
+            
+            // Auto scroll ke paling bawah untuk bersiap-siap chat
+            displayArea.scrollTo({ top: displayArea.scrollHeight, behavior: 'smooth' });
         }
 
         // ==========================================
@@ -470,6 +486,7 @@
             const secretContainer = document.getElementById('pdf-secret-container');
             secretContainer.innerHTML = sourceHTML;
             
+            // Matikan style yang bikin html2pdf ngebug
             const cards = secretContainer.querySelectorAll('.ai-card');
             cards.forEach(card => {
                 card.style.transform = 'none';
@@ -485,7 +502,7 @@
 
             const opt = {
                 margin:       15,
-                filename:     `MetanAI_Report_${topicName.replace(/\s+/g, '_')}.pdf`,
+                filename:     `TrendyAI_Report_${topicName.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
@@ -510,18 +527,28 @@
         // SISTEM METAN AI, PARSER & SMART MERGE CACHE
         // ==========================================
         function formatMarkdown(text) {
+            if (!text) return "";
             let formatted = text;
+            
+            // Membersihkan semua karakter bintang (*), hash (#), dan markdown liar lainnya
+            formatted = formatted.replace(/\*\*/g, ''); 
             formatted = formatted.replace(/\*/g, '');
             formatted = formatted.replace(/###/g, '');
-            formatted = formatted.replace(/^[\-\*]\s+(.*)$/gm, '<ul><li>$1</li></ul>');
+            formatted = formatted.replace(/##/g, '');
+            
+            // Merapikan list item
+            formatted = formatted.replace(/^[\-\•]\s+(.*)$/gm, '<ul><li>$1</li></ul>');
             formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Membersihkan double ul
             formatted = formatted.replace(/<\/ul><br><ul>/g, '');
             formatted = formatted.replace(/<br><ul/g, '<ul');
-            return formatted;
+            return formatted.trim();
         }
 
         function extractSection(text, tag) {
-            const regex = new RegExp(`\\${tag}([\\s\\S]*?)(?=\\[|$)`, 'i');
+            // Mencari teks setelah tag tertentu hingga bertemu tag lainnya atau akhir string
+            const regex = new RegExp(`\\${tag}([\\s\\S]*?)(?=\\[[A-Z]+\\]|$)`, 'i');
             const match = text.match(regex);
             return match ? match[1].trim() : '';
         }
@@ -534,11 +561,13 @@
 
             const toggleContent = document.getElementById('toggle-content').classList.contains('active');
             const toggleSales = document.getElementById('toggle-sales').classList.contains('active');
+            const toggleResearch = document.getElementById('toggle-research').classList.contains('active');
             
             const showVisual = isHistoryClick ? aiText.includes('[IMAGEPROMPT]') : isVisualRequested;
-            const showAnalisis = true; 
+            const showAnalisis = true; // Selalu tampilkan ringkasan
             const showKonten = isHistoryClick ? aiText.includes('[KONTEN]') : toggleContent;
             const showJualan = isHistoryClick ? aiText.includes('[JUALAN]') : toggleSales;
+            const showResearch = isHistoryClick ? aiText.includes('[RESEARCH]') : toggleResearch;
             
             const dateStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
             const reportId = 'report_' + Math.random().toString(36).substr(2, 9);
@@ -553,7 +582,7 @@
                     <div style="padding: 10px 0; color: #fafafa; width: 100%;">
                         <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 25px;">
                             <h3 style="color: var(--accent-blue); margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px;">
-                                <i class="fa-solid fa-bolt"></i> Metan Intelligence Report
+                                <i class="fa-solid fa-bolt"></i> Trendy Intelligence Report
                             </h3>
                             <p style="color: var(--text-dim); font-size: 13px; margin: 0;">Disusun untuk: <strong style="color:white;">${guestData.name || 'Guest'}</strong> &nbsp;|&nbsp; Tanggal: ${dateStr}</p>
                         </div>
@@ -561,46 +590,42 @@
             
             let delay = 0;
 
-            if (aiText.includes('[ANALISIS]') && showAnalisis) {
-                let text = formatMarkdown(extractSection(aiText, '[ANALISIS]'));
-                resultHtml += `<div class="ai-card card-analisis" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Analisis Singkat</div><div class="content-body">${text}</div></div>`;
+            const analisisText = extractSection(aiText, '[ANALISIS]');
+            if (analisisText && showAnalisis) {
+                resultHtml += `<div class="ai-card card-analisis" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Analisis Singkat</div><div class="content-body">${formatMarkdown(analisisText)}</div></div>`;
                 delay += 0.15;
             }
-            if (aiText.includes('[KONTEN]') && showKonten) {
-                let text = formatMarkdown(extractSection(aiText, '[KONTEN]'));
-                resultHtml += `<div class="ai-card card-konten" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-video"></i> Ide Konten Viral</div><div class="content-body">${text}</div></div>`;
-                delay += 0.15;
-            }
-            if (aiText.includes('[JUALAN]') && showJualan) {
-                let text = formatMarkdown(extractSection(aiText, '[JUALAN]'));
-                resultHtml += `<div class="ai-card card-sales" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-tags"></i> Strategi Konversi / Promo</div><div class="content-body">${text}</div></div>`;
+            
+            const researchText = extractSection(aiText, '[RESEARCH]');
+            if (researchText && showResearch) {
+                resultHtml += `<div class="ai-card card-research" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-chart-line"></i> Research Penjualan</div><div class="content-body">${formatMarkdown(researchText)}</div></div>`;
                 delay += 0.15;
             }
 
-            if (!aiText.includes('[ANALISIS]') && !aiText.includes('[KONTEN]') && !aiText.includes('[JUALAN]') && !aiText.includes('[IMAGEPROMPT]')) {
-                const parts = aiText.split(/\d\./);
-                parts.forEach((p, index) => {
-                    if(p.trim().length < 5) return;
-                    let title = index === 1 ? "Analisis Pasar" : index === 2 ? "Ide Konten Viral" : "Strategi Konversi";
-                    let icon = index === 1 ? "fa-magnifying-glass-chart" : index === 2 ? "fa-video" : "fa-tags";
-                    let cssClass = index === 1 ? "card-analisis" : index === 2 ? "card-konten" : "card-sales";
-                    
-                    if (!isHistoryClick) {
-                        if (index === 2 && !showKonten) return;
-                        if (index === 3 && !showJualan) return;
-                    }
-
-                    let cleanedText = formatMarkdown(p.trim());
-                    resultHtml += `<div class="ai-card ${cssClass}" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid ${icon}"></i> ${title}</div><div class="content-body">${cleanedText}</div></div>`;
-                    delay += 0.15;
-                });
+            const kontenText = extractSection(aiText, '[KONTEN]');
+            if (kontenText && showKonten) {
+                resultHtml += `<div class="ai-card card-konten" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-video"></i> Ide Konten Viral</div><div class="content-body">${formatMarkdown(kontenText)}</div></div>`;
+                delay += 0.15;
+            }
+            
+            const jualanText = extractSection(aiText, '[JUALAN]');
+            if (jualanText && showJualan) {
+                resultHtml += `<div class="ai-card card-sales" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-tags"></i> Strategi Konversi / Promo</div><div class="content-body">${formatMarkdown(jualanText)}</div></div>`;
+                delay += 0.15;
             }
 
+            // Fallback apabila AI gagal memakai format yang dikasih (format berantakan)
+            if (!aiText.includes('[ANALISIS]') && !aiText.includes('[KONTEN]') && !aiText.includes('[JUALAN]') && !aiText.includes('[RESEARCH]') && aiText.trim().length > 20) {
+                 resultHtml += `<div class="ai-card card-analisis" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-brain"></i> Hasil Analisis AI</div><div class="content-body">${formatMarkdown(aiText)}</div></div>`;
+                 delay += 0.15;
+            }
+
+            // GENERASI GAMBAR AI
             if (showVisual) {
                 let cleanTopic = topic.replace(/[^a-zA-Z0-9\s]/g, '').trim(); 
                 if(cleanTopic.length < 3) cleanTopic = "trend";
 
-                let safePrompt = encodeURIComponent(cleanTopic + " aesthetic modern minimalist high quality");
+                let safePrompt = encodeURIComponent(cleanTopic + " aesthetic modern minimalist high quality product photography");
                 let randomSeed = Math.floor(Math.random() * 100000);
                 let imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=450&nologo=true&seed=${randomSeed}`;
                 
@@ -656,10 +681,10 @@
         // HYBRID AI LOGIC (GEMINI -> GROQ)
         // ==========================================
         async function fetchAIResponse(prompt) {
-            // TRY 1: GEMINI (Stable Version: v1 models/gemini-1.5-flash)
+            // TRY 1: GEMINI (Fix 404 URL, kita hapus "latest" biar konsisten)
             try {
-                console.log("Mencoba Gemini...");
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+                console.log("Mencoba Gemini 1.5 Flash...");
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -668,12 +693,14 @@
                 const data = await response.json();
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
                     return { source: 'Gemini', text: data.candidates[0].content.parts[0].text };
+                } else if(data.error) {
+                    console.warn("Gemini Error:", data.error.message);
                 }
             } catch (e) {
                 console.warn("Gemini limit/error, otomatis beralih ke Groq...", e);
             }
 
-            // TRY 2: GROQ (Llama 3.1 8B Instant)
+            // TRY 2: GROQ (Llama 3.1 8B Instant - Fix Decommissioned Model)
             console.log("Mencoba Groq...");
             const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
@@ -682,7 +709,7 @@
                     'Content-Type': 'application/json' 
                 },
                 body: JSON.stringify({
-                    model: "llama-3.1-8b-instant",
+                    model: "llama-3.1-8b-instant", // Model paling kuat dan aktif saat ini
                     messages: [{ role: "user", content: prompt }]
                 })
             });
@@ -690,7 +717,7 @@
             const data = await response.json();
             if (data.error) throw new Error(data.error.message);
             if (data.choices && data.choices[0]) {
-                return { source: 'Llama 3 (Groq)', text: data.choices[0].message.content };
+                return { source: 'Llama 3.1 (Groq)', text: data.choices[0].message.content };
             }
             
             throw new Error("Semua server AI sedang sibuk.");
@@ -710,14 +737,16 @@
             
             const isContent = document.getElementById('toggle-content').classList.contains('active');
             const isSales = document.getElementById('toggle-sales').classList.contains('active');
+            const isResearch = document.getElementById('toggle-research').classList.contains('active');
             const isImage = document.getElementById('toggle-image').classList.contains('active');
 
             if (!topic) { showToast("Masukkan topik tren terlebih dahulu!", "error"); return; }
-            if (!isContent && !isSales && !isImage) { showToast("Pilih minimal 1 fitur!", "error"); return; }
+            if (!isContent && !isSales && !isImage && !isResearch) { showToast("Pilih minimal 1 fitur!", "error"); return; }
 
             try {
                 showLoading("Menyisir <span>database global</span>...");
                 
+                // 1. CARI DULU DI DATABASE
                 const { data: allCache, error: cacheError } = await supabaseClient
                     .from('trends_data')
                     .select('*')
@@ -727,41 +756,50 @@
                 if (cacheError) console.warn("Supabase fetch warning:", cacheError);
 
                 let existingEntry = null;
-                let existingData = { analisis: '', konten: '', jualan: '', imageprompt: '' };
+                let existingData = { analisis: '', konten: '', jualan: '', research: '', imageprompt: '' };
 
+                // LOGIKA PENCARIAN TEPAT (EXACT MATCH / HIGH RELEVANCE)
                 if (allCache && allCache.length > 0) {
                     let searchTarget = topic.toLowerCase();
                     for (let item of allCache) {
                         let dbTopic = item.trending_topic.toLowerCase();
+                        // Hanya gunakan cache jika kata yang dicari sangat identik atau substring yang relevan.
                         if (dbTopic === searchTarget || (dbTopic.includes(searchTarget) && Math.abs(dbTopic.length - searchTarget.length) < 5)) {
                             existingEntry = item;
                             let text = item.ai_suggestion || '';
                             if (text.includes('[ANALISIS]')) existingData.analisis = extractSection(text, '[ANALISIS]');
                             if (text.includes('[KONTEN]')) existingData.konten = extractSection(text, '[KONTEN]');
                             if (text.includes('[JUALAN]')) existingData.jualan = extractSection(text, '[JUALAN]');
+                            if (text.includes('[RESEARCH]')) existingData.research = extractSection(text, '[RESEARCH]');
                             if (text.includes('[IMAGEPROMPT]')) existingData.imageprompt = extractSection(text, '[IMAGEPROMPT]');
                             break; 
                         }
                     }
                 }
 
+                // SMART CACHE LOGIC: Apakah info yang ada sudah cukup untuk menjawab keinginan user?
+                // Kalau user minta Research tapi di DB blm ada research, maka sistem harus fetch AI lagi
                 let needsAnalisis = true && !existingData.analisis; 
                 let needsKonten = isContent && !existingData.konten;
                 let needsJualan = isSales && !existingData.jualan;
+                let needsResearch = isResearch && !existingData.research;
                 let needsImage = isImage && !existingData.imageprompt;
 
-                if (!needsAnalisis && !needsKonten && !needsJualan && !needsImage && existingEntry) {
+                // JIKA DATABASE SUDAH LENGKAP MENGANDUNG SEMUA FITUR YANG DIPILIH, LANGSUNG TAMPILKAN
+                if (!needsAnalisis && !needsKonten && !needsJualan && !needsResearch && !needsImage && existingEntry) {
                     hideLoading();
                     showToast("Data dimuat dari Database Global!", "success");
                     
                     let displayCache = '';
                     if (existingData.analisis) displayCache += `\n[ANALISIS]\n${existingData.analisis}\n`;
+                    if (existingData.research) displayCache += `\n[RESEARCH]\n${existingData.research}\n`;
                     if (existingData.konten) displayCache += `\n[KONTEN]\n${existingData.konten}\n`;
                     if (existingData.jualan) displayCache += `\n[JUALAN]\n${existingData.jualan}\n`;
                     if (existingData.imageprompt) displayCache += `\n[IMAGEPROMPT]\n${existingData.imageprompt}\n`;
 
                     renderResultToDisplay(topic, displayCache, false, isImage);
 
+                    // Duplikat data ke history pengguna ini jika dia mengambil data dari user lain
                     if (existingEntry.user_id !== guestData.id) {
                         await supabaseClient.from('trends_data').insert([{ 
                             platform: existingEntry.platform, 
@@ -769,39 +807,45 @@
                             ai_suggestion: displayCache,
                             user_id: guestData.id 
                         }]);
-                        fetchHistory();
+                        fetchHistory(); // Update sidebar real-time
                     }
                     
                     document.getElementById('input-topic').value = '';
                     return; 
                 }
 
+                // 3. JIKA BEDA KONTEKS / INFO DIBUTUHKAN BELUM ADA DI DB, PANGGIL HYBRID AI
                 showLoading("Menganalisis menggunakan <span>Metan AI Hybrid</span>...");
                 
-                let prompt = `Sebagai pakar digital marketing Gen-Z, analisis tren "${topic}" di ${platform} untuk bisnis: ${business}.
-                DILARANG KERAS menggunakan simbol bintang (*) atau hashtag (#) berlebihan. Gunakan format list bullet strip (-) yang rapi.
-                HANYA berikan respons untuk bagian di bawah ini, diawali persis dengan TAG KOTAK.\n`;
+                let prompt = `Sebagai pakar digital marketing, analisis tren pasar untuk topik "${topic}" di platform ${platform}, fokuskan untuk diaplikasikan pada bisnis: ${business}.
+                DILARANG KERAS menggunakan simbol bintang (*) atau format markdown hashtag (#) yang berlebihan. Gunakan format list bullet berupa strip (-) biasa.
+                HANYA berikan respons untuk bagian yang diminta di bawah ini, setiap bagian HARUS diawali persis dengan TAG KOTAK.\n`;
                 
-                if (needsAnalisis) prompt += `\n[ANALISIS]\nJelaskan 2 kalimat kenapa tren ini viral, tulis dengan rapi.\n`;
-                if (needsKonten) prompt += `\n[KONTEN]\nBerikan 2 ide video viral "out of the box" (Sebutkan Hook & Visual secara rapi).\n`;
-                if (needsJualan) prompt += `\n[JUALAN]\nBerikan 1 strategi promo, bundling, atau CTA (Call To Action) yang bikin audiens FOMO.\n`;
+                if (needsAnalisis) prompt += `\n[ANALISIS]\nBerikan penjelasan singkat 2-3 kalimat mengapa topik ini sedang tren atau viral.\n`;
+                if (needsResearch) prompt += `\n[RESEARCH]\nBerikan analisis riset penjualan: potensi minat pasar, potensi bahan baku yang dibutuhkan, atau celah peluang untuk ikut berjualan terkait tren ini.\n`;
+                if (needsKonten) prompt += `\n[KONTEN]\nBerikan 2 ide video viral "out of the box". Jelaskan Hook dan visual yang harus ditampilkan.\n`;
+                if (needsJualan) prompt += `\n[JUALAN]\nBerikan 1 strategi jualan jitu: promo, bundling, atau penawaran Call To Action (CTA) yang memancing FOMO.\n`;
                 if (needsImage) prompt += `\n[IMAGEPROMPT]\nOK\n`;
 
                 const aiResult = await fetchAIResponse(prompt);
                 const aiTextResponse = aiResult.text;
 
+                // GABUNG DATA LAMA DI DATABASE (Jika ada) + HASIL AI BARU
                 let newAnalisis = aiTextResponse.includes('[ANALISIS]') ? extractSection(aiTextResponse, '[ANALISIS]') : '';
+                let newResearch = aiTextResponse.includes('[RESEARCH]') ? extractSection(aiTextResponse, '[RESEARCH]') : '';
                 let newKonten = aiTextResponse.includes('[KONTEN]') ? extractSection(aiTextResponse, '[KONTEN]') : '';
                 let newJualan = aiTextResponse.includes('[JUALAN]') ? extractSection(aiTextResponse, '[JUALAN]') : '';
                 let newImage = aiTextResponse.includes('[IMAGEPROMPT]') ? extractSection(aiTextResponse, '[IMAGEPROMPT]') : '';
 
                 let finalAnalisis = existingData.analisis || newAnalisis;
+                let finalResearch = existingData.research || newResearch;
                 let finalKonten = existingData.konten || newKonten;
                 let finalJualan = existingData.jualan || newJualan;
                 let finalImage = existingData.imageprompt || newImage;
 
                 let combinedFinal = '';
                 if (finalAnalisis) combinedFinal += `\n[ANALISIS]\n${finalAnalisis}\n`;
+                if (finalResearch) combinedFinal += `\n[RESEARCH]\n${finalResearch}\n`;
                 if (finalKonten) combinedFinal += `\n[KONTEN]\n${finalKonten}\n`;
                 if (finalJualan) combinedFinal += `\n[JUALAN]\n${finalJualan}\n`;
                 if (finalImage) combinedFinal += `\n[IMAGEPROMPT]\n${finalImage}\n`;
@@ -810,6 +854,7 @@
                 showToast(`Strategi sukses diracik oleh ${aiResult.source}!`, "success");
                 renderResultToDisplay(topic, combinedFinal, false, isImage);
 
+                // UPDATE / INSERT KE SUPABASE
                 if (existingEntry) {
                     await supabaseClient.from('trends_data').update({ ai_suggestion: combinedFinal }).eq('id', existingEntry.id);
                 } else {
@@ -821,7 +866,7 @@
                     }]);
                 }
                 
-                fetchHistory();
+                fetchHistory(); // Memanggil sejarah untuk render history di list realtime
                 document.getElementById('input-topic').value = '';
 
             } catch (e) {
