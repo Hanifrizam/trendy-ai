@@ -112,7 +112,7 @@
         .card-analisis { border-left: 4px solid var(--text-dim); }
         .card-konten { border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(to right, rgba(168,85,247,0.05), #121214); }
         .card-sales { border: 1px dashed rgba(16, 185, 129, 0.5); background: linear-gradient(to right, rgba(16,185,129,0.05), #121214); }
-        .card-visual { border: 1px solid var(--border-color); background: #121214; }
+        .card-visual { border: 1px solid var(--border-color); background: #121214;}
 
         @keyframes cardAppear { to { opacity: 1; transform: translateY(0); } }
 
@@ -128,7 +128,7 @@
         .content-body ul { margin: 15px 0; padding-left: 20px; list-style-type: '⚡  '; }
         .content-body li { margin-bottom: 12px; padding-left: 5px; }
 
-        /* --- INPUT AREA & TOGGLES (Mobile Slider) --- */
+        /* --- INPUT AREA & TOGGLES (Mobile Slider Added) --- */
         .input-box { padding: 20px 15% 40px; background: linear-gradient(to top, var(--bg-dark) 80%, transparent); position: absolute; bottom: 0; width: 100%; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 40;}
         .drag-handle { display: none; width: 100%; text-align: center; padding: 10px 0; cursor: pointer; margin-top: -15px; margin-bottom: 5px;}
         .drag-handle span { display: inline-block; width: 50px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 5px; transition: background 0.3s; }
@@ -289,7 +289,8 @@
         const supabaseKey = 'sb_publishable_CM0leWbXShfwZ9riFphpYQ_r7kRQUPm'; 
         
         // --- API KEYS ---
-        function _0x54e1(){const _0x3ae1b2=['34YEBgcc','19514kVlAzr','6434vzNoWU','15144MazVGg','3379662UUVRyV','292248NdtjsV','44025TUKltx','960483xztzgY','1351qCThKv','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','2360xWlwdX','42Mxdqyi'];_0x54e1=function(){return _0x3ae1b2;};return _0x54e1();}function _0x3712(_0x45ce40,_0x3c9c0a){const _0x54e1c7=_0x54e1();return _0x3712=function(_0x37124f,_0xfe2a95){_0x37124f=_0x37124f-0x1c0;let _0x5baaaa=_0x54e1c7[_0x37124f];return _0x5baaaa;},_0x3712(_0x45ce40,_0x3c9c0a);}const _0x3f938d=_0x3712;(function(_0x2ac406,_0x21248d){const _0x547d16=_0x3712,_0x45af30=_0x2ac406();while(!![]){try{const _0x348e4c=parseInt(_0x547d16(0x1c3))/0x1*(parseInt(_0x547d16(0x1c1))/0x2)+-parseInt(_0x547d16(0x1c8))/0x3+parseInt(_0x547d16(0x1c6))/0x4+parseInt(_0x547d16(0x1c7))/0x5*(parseInt(_0x547d16(0x1c0))/0x6)+-parseInt(_0x547d16(0x1c9))/0x7*(-parseInt(_0x547d16(0x1c4))/0x8)+parseInt(_0x547d16(0x1c5))/0x9+parseInt(_0x547d16(0x1cb))/0xa*(-parseInt(_0x547d16(0x1c2))/0xb);if(_0x348e4c===_0x21248d)break;else _0x45af30['push'](_0x45af30['shift']());}catch(_0x1a1558){_0x45af30['push'](_0x45af30['shift']());}}}(_0x54e1,0x3c165));const geminiApiKey='AIzaSyA4qZIpPpl4SItjhzZ2yPhzkxhis24wF10',groqApiKey=_0x3f938d(0x1ca);
+        const geminiApiKey = 'AIzaSyA4qZIpPpl4SItjhzZ2yPhzkxhis24wF10'; 
+        const groqApiKey = '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'; 
 
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -344,7 +345,7 @@
         function startNewChat() {
             const displayArea = document.getElementById('display-area');
             displayArea.innerHTML = `
-                <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.5s ease;">
+                <div id="welcome-msg" style="text-align:center; margin-top:15vh; animation: floatUp 0.8s ease;">
                     <div style="font-size: 60px; margin-bottom: 20px; color: var(--accent-blue); opacity: 0.8;"><i class="fa-solid fa-brain"></i></div>
                     <h1 style="font-size: 42px; margin-bottom:15px; letter-spacing: -1px;">Metan Intelligence.</h1>
                     <p style="color: var(--text-dim); font-size: 16px; max-width: 400px; margin: 0 auto; line-height: 1.6;">
@@ -435,7 +436,7 @@
             location.reload();
         }
 
-        window.onload = checkSession; // Panggil saat web diload
+        window.onload = checkSession; 
 
         // ==========================================
         // THE ULTIMATE PDF EXPORT (ANTI-BLANK Kloning Rahasia)
@@ -628,10 +629,10 @@
         // HYBRID AI LOGIC (GEMINI -> GROQ)
         // ==========================================
         async function fetchAIResponse(prompt) {
-            // TRY 1: GEMINI (Anti 404 & 400 fix)
+            // TRY 1: GEMINI (Stable Version - Anti 404/400)
             try {
                 console.log("Mencoba Gemini...");
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -645,7 +646,7 @@
                 console.warn("Gemini limit/error, otomatis beralih ke Groq...", e);
             }
 
-            // TRY 2: GROQ (Llama 3) (Anti Error Suhu/Temperature Fix)
+            // TRY 2: GROQ (Llama 3.1)
             console.log("Mencoba Groq...");
             const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
@@ -654,7 +655,7 @@
                     'Content-Type': 'application/json' 
                 },
                 body: JSON.stringify({
-                    model: "llama3-8b-8192", // Model paling kuat & stabil di Groq
+                    model: "llama-3.1-8b-instant",
                     messages: [{ role: "user", content: prompt }]
                 })
             });
@@ -669,9 +670,7 @@
         }
 
 
-        // ==========================================
-        // MAIN DATABASE & CACHE LOGIC
-        // ==========================================
+        // REAL DATABASE CACHE LOGIC
         async function processAnalysis(e) {
             if(e) e.stopPropagation(); 
             if (!guestData || !guestData.id) { showToast("Sesi habis, silakan refresh browser.", "error"); return; }
@@ -690,15 +689,12 @@
             try {
                 showLoading("Menyisir <span>database global</span>...");
                 
-                // 1. CEK DULU DI DATABASE (PENGGUNA LAIN/SENDIRI)
-                // Filter menggunakan JS agar tidak error Syntax Supabase 400 Bad Request
-                const { data: allCache, error: cacheError } = await supabaseClient
+                // 1. CARI DULU DI DATABASE UNTUK HEMAT KUOTA AI
+                const { data: allCache } = await supabaseClient
                     .from('trends_data')
                     .select('*')
                     .eq('platform', platform)
                     .order('created_at', { ascending: false });
-
-                if (cacheError) console.warn("Supabase fetch warning:", cacheError);
 
                 let existingEntry = null;
                 let existingData = { analisis: '', konten: '', jualan: '', imageprompt: '' };
@@ -719,7 +715,7 @@
                     }
                 }
 
-                // SMART CACHE LOGIC: Cek info yang kurang di database
+                // LOGIKA SMART CACHE: Apakah info yang ada sudah cukup untuk menjawab keinginan user?
                 let needsAnalisis = true && !existingData.analisis; 
                 let needsKonten = isContent && !existingData.konten;
                 let needsJualan = isSales && !existingData.jualan;
@@ -753,7 +749,7 @@
                     return; 
                 }
 
-                // 3. JIKA ADA DATA YANG KURANG, PANGGIL HYBRID AI
+                // 3. JIKA INFO KURANG/TIDAK ADA, PANGGIL HYBRID AI
                 showLoading("Menganalisis menggunakan <span>Metan AI Hybrid</span>...");
                 
                 let prompt = `Sebagai pakar digital marketing Gen-Z, analisis tren "${topic}" di ${platform} untuk bisnis: ${business}.
@@ -765,10 +761,11 @@
                 if (needsJualan) prompt += `\n[JUALAN]\nBerikan 1 strategi promo, bundling, atau CTA (Call To Action) yang bikin audiens FOMO.\n`;
                 if (needsImage) prompt += `\n[IMAGEPROMPT]\nOK\n`;
 
+                // Panggil fungsi Hybrid (Mencoba Gemini, jika gagal otomatis ke Groq)
                 const aiResult = await fetchAIResponse(prompt);
                 const aiTextResponse = aiResult.text;
 
-                // GABUNG DATA LAMA DI DATABASE + HASIL AI BARU
+                // Gabungkan dengan data lama (Jika sebagian sudah ada di database)
                 let newAnalisis = aiTextResponse.includes('[ANALISIS]') ? extractSection(aiTextResponse, '[ANALISIS]') : '';
                 let newKonten = aiTextResponse.includes('[KONTEN]') ? extractSection(aiTextResponse, '[KONTEN]') : '';
                 let newJualan = aiTextResponse.includes('[JUALAN]') ? extractSection(aiTextResponse, '[JUALAN]') : '';
@@ -786,10 +783,10 @@
                 if (finalImage) combinedFinal += `\n[IMAGEPROMPT]\n${finalImage}\n`;
                 
                 hideLoading();
-                showToast(`Strategi sukses diracik oleh ${aiResult.source}!`, "success");
+                showToast(`Strategi diracik sukses dengan ${aiResult.source}!`, "success");
                 renderResultToDisplay(topic, combinedFinal, false);
 
-                // UPDATE/INSERT DATABASE BARU KE SUPABASE
+                // Update atau Insert ke Supabase
                 if (existingEntry) {
                     await supabaseClient.from('trends_data').update({ ai_suggestion: combinedFinal }).eq('id', existingEntry.id);
                 } else {
@@ -807,7 +804,7 @@
             } catch (e) {
                 console.error('Koneksi Gagal:', e);
                 hideLoading();
-                showToast("Gagal: " + e.message, "error");
+                showToast("Sistem gagal merespon: " + e.message, "error");
             }
         }
 
@@ -817,7 +814,7 @@
                 const { data } = await supabaseClient
                     .from('trends_data')
                     .select('*')
-                    .eq('user_id', guestData.id) // Memunculkan hanya milik guest ini
+                    .eq('user_id', guestData.id) // Memunculkan hanya milik guest yang sedang main
                     .order('created_at', { ascending: false })
                     .limit(20);
                 
