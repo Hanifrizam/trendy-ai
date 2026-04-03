@@ -11,13 +11,18 @@
     
     <style>
         :root {
-            --bg-main: #212121;
+            /* Tema Warna ala Gemini / DeepSeek Dark Mode */
+            --bg-main: #1e1e1e;
             --bg-sidebar: #171717;
-            --bg-card: #2f2f2f;
+            --bg-input: #2f2f2f;
+            --bg-bubble-user: #3b82f6; /* Warna chat user */
+            --bg-bubble-ai: #212121;  /* Background AI section utama */
+            
             --accent-blue: #3b82f6;
             --accent-purple: #a855f7;
             --accent-green: #10b981;
             --accent-yellow: #f59e0b;
+            
             --border-color: rgba(255, 255, 255, 0.1);
             --text-main: #ececec;
             --text-dim: #a1a1aa;
@@ -40,105 +45,116 @@
         .auth-card h2 { color: var(--text-main); font-size: 26px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
         .auth-card h2 i { color: var(--accent-blue); }
         .auth-card p { color: var(--text-dim); font-size: 14px; margin-bottom: 30px; line-height: 1.5; }
-        .auth-input, .auth-select { width: 100%; padding: 14px 18px; margin-bottom: 15px; background: var(--bg-card); border: 1px solid transparent; color: white; border-radius: 10px; outline: none; font-size: 14px; transition: all 0.3s; }
+        .auth-input, .auth-select { width: 100%; padding: 14px 18px; margin-bottom: 15px; background: var(--bg-input); border: 1px solid transparent; color: white; border-radius: 10px; outline: none; font-size: 14px; transition: all 0.3s; }
         .auth-input:focus, .auth-select:focus { border-color: var(--accent-blue); }
+        .auth-select option { background: var(--bg-main); color: white; }
         .auth-btn { width: 100%; padding: 14px; background: white; color: black; border: none; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s; }
-        .auth-btn:hover { background: #e5e5e5; }
+        .auth-btn:hover { background: #e5e5e5; transform: translateY(-2px); }
 
-        /* --- APP CONTAINER & SIDEBAR --- */
-        #app-screen { display: none; width: 100%; height: 100%; }
+        /* --- SIDEBAR --- */
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99; opacity: 0; transition: opacity 0.3s; }
         .sidebar { width: 260px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; padding: 20px 0; flex-shrink: 0; z-index: 100; transition: transform 0.3s ease; }
         .sidebar-header { font-size: 18px; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; color: var(--text-main); padding: 0 20px; }
+        .sidebar-header i { color: var(--accent-blue); }
         
-        .new-chat-btn { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px; border-radius: 8px; margin: 0 20px 20px 20px; cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: flex-start; gap: 10px; transition: all 0.2s; font-size: 14px;}
-        .new-chat-btn:hover { background: var(--bg-card); }
+        .new-chat-btn { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 10px; margin: 0 20px 20px 20px; cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: flex-start; gap: 10px; transition: all 0.2s; font-size: 14px;}
+        .new-chat-btn:hover { background: var(--bg-input); border-color: var(--accent-blue); }
         
         .history-container { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding: 0 15px; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         
-        .history-item { padding: 10px 12px; border-radius: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; cursor: pointer; color: var(--text-dim); transition: 0.2s; }
-        .history-item:hover { background: var(--bg-card); color: white; }
-        .history-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; margin-right: 10px; }
-        .delete-btn { color: #ef4444; cursor: pointer; opacity: 0; transition: 0.2s; }
+        .history-item { padding: 12px 14px; border-radius: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; cursor: pointer; color: var(--text-dim); transition: 0.2s; border: 1px solid transparent;}
+        .history-item:hover { background: var(--bg-input); color: white; border-color: rgba(255,255,255,0.05); }
+        .history-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; margin-right: 10px; display: flex; align-items: center; gap: 8px;}
+        .delete-btn { color: #ef4444; cursor: pointer; opacity: 0; transition: 0.2s; padding: 4px;}
         .history-item:hover .delete-btn { opacity: 0.8; }
-        .delete-btn:hover { opacity: 1 !important; }
+        .delete-btn:hover { opacity: 1 !important; transform: scale(1.1);}
 
         .guest-profile { padding: 15px 20px; border-top: 1px solid var(--border-color); margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
         .profile-info { display: flex; flex-direction: column; }
         .guest-name { font-size: 14px; font-weight: 600; color: white; }
-        .guest-detail { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
-        .logout-btn { color: var(--text-dim); cursor: pointer; transition: 0.2s; padding: 5px; }
-        .logout-btn:hover { color: white; }
+        .guest-detail { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+        .logout-btn { color: var(--text-dim); cursor: pointer; transition: 0.2s; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px;}
+        .logout-btn:hover { color: white; background: rgba(239, 68, 68, 0.2); color: #ef4444; }
 
         /* --- MAIN CONTENT & CHAT AREA --- */
+        #app-screen { display: none; width: 100%; height: 100%; }
         .main-content { flex-grow: 1; display: flex; flex-direction: column; position: relative; background: var(--bg-main); height: 100vh; }
-        .mobile-header { display: none; padding: 15px 20px; align-items: center; border-bottom: 1px solid var(--border-color); background: var(--bg-main); z-index: 50; }
+        .mobile-header { display: none; padding: 15px 20px; align-items: center; border-bottom: 1px solid var(--border-color); background: var(--bg-sidebar); z-index: 50; }
         .menu-toggle { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; }
         .mobile-title { font-weight: 600; margin-left: 15px; font-size: 16px; }
 
-        .display-area { flex-grow: 1; overflow-y: auto; padding: 40px 15% 20px 15%; scroll-behavior: smooth; display: flex; flex-direction: column; }
+        /* Area Chatting */
+        .display-area { flex-grow: 1; overflow-y: auto; padding: 40px 0 150px 0; scroll-behavior: smooth; display: flex; flex-direction: column; align-items: center; }
 
-        /* Welcome Message */
-        .welcome-wrapper { margin: auto; text-align: center; max-width: 500px; animation: floatUp 0.6s ease; }
-        .welcome-wrapper i { font-size: 48px; color: var(--text-dim); margin-bottom: 20px; }
-        .welcome-wrapper h1 { font-size: 32px; margin-bottom: 10px; font-weight: 600; }
+        .welcome-wrapper { margin: auto; text-align: center; max-width: 500px; animation: floatUp 0.8s ease; padding: 20px;}
+        .welcome-wrapper i { font-size: 54px; color: var(--text-dim); margin-bottom: 20px; }
+        .welcome-wrapper h1 { font-size: 36px; margin-bottom: 15px; font-weight: 700; letter-spacing: -1px;}
         .welcome-wrapper p { color: var(--text-dim); font-size: 15px; line-height: 1.6; }
 
-        /* Chat Bubbles (UI Modern) */
-        .chat-row { width: 100%; max-width: 768px; margin: 0 auto 30px auto; display: flex; flex-direction: column; animation: cardAppear 0.5s ease forwards; }
-        
-        .user-bubble { align-self: flex-end; background: var(--bg-card); padding: 12px 18px; border-radius: 18px; border-bottom-right-radius: 4px; max-width: 80%; font-size: 15px; color: white; margin-bottom: 20px; }
+        /* CHAT BUBBLES UI/UX */
+        .chat-row { width: 100%; max-width: 800px; margin: 0 auto 30px auto; display: flex; flex-direction: column; padding: 0 20px; animation: cardAppear 0.5s ease forwards; }
+        @keyframes cardAppear { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user-bubble { align-self: flex-end; background: var(--bg-input); padding: 14px 20px; border-radius: 20px; border-bottom-right-radius: 4px; max-width: 85%; font-size: 15px; color: white; line-height: 1.5; border: 1px solid var(--border-color);}
         
         .ai-bubble { align-self: flex-start; width: 100%; }
-        .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .ai-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; }
-        .ai-title i { color: var(--accent-blue); }
-        .pdf-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
-        .pdf-btn:hover { background: rgba(255,255,255,0.1); }
+        .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 10px;}
+        .ai-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; color: var(--text-main);}
+        .ai-title img { width: 24px; height: 24px; } /* Icon bot jika ada */
+        
+        .pdf-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
+        .pdf-btn:hover { background: rgba(255,255,255,0.1); border-color: white;}
 
-        .ai-section { margin-bottom: 20px; }
-        .section-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .color-analisis { color: var(--text-main); }
+        /* SECTIONS DALAM BUBBLE AI (Berwarna) */
+        .ai-card { background: var(--bg-bubble-ai); border-radius: 16px; padding: 25px; margin-bottom: 16px; border-left: 4px solid var(--text-dim); border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);}
+        .card-analisis { border-left-color: var(--text-dim); }
+        .card-research { border-left-color: var(--accent-yellow); background: linear-gradient(to right, rgba(245,158,11,0.03), transparent); }
+        .card-konten { border-left-color: var(--accent-purple); background: linear-gradient(to right, rgba(168,85,247,0.03), transparent); }
+        .card-sales { border-left-color: var(--accent-green); background: linear-gradient(to right, rgba(16,185,129,0.03), transparent); }
+        .card-visual { border-left-color: var(--accent-blue); background: linear-gradient(to right, rgba(59,130,246,0.03), transparent); }
+
+        .section-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .color-analisis { color: var(--text-dim); }
         .color-research { color: var(--accent-yellow); }
         .color-konten { color: var(--accent-purple); }
         .color-sales { color: var(--accent-green); }
         .color-visual { color: var(--accent-blue); }
 
-        .content-body { line-height: 1.7; font-size: 15px; color: #d1d5db; }
+        .content-body { line-height: 1.7; font-size: 15px; color: #d1d5db; word-wrap: break-word;}
         .content-body strong { color: white; font-weight: 600; }
-        .content-body ul { padding-left: 20px; margin: 8px 0; }
-        .content-body li { margin-bottom: 6px; }
+        .content-body ul { padding-left: 20px; margin: 10px 0; }
+        .content-body li { margin-bottom: 8px; padding-left: 5px;}
         .visual-img { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid var(--border-color); object-fit: cover; }
 
-        @keyframes cardAppear { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- INPUT AREA (Stays at bottom) --- */
-        .input-area-wrapper { padding: 10px 15% 30px 15%; background: linear-gradient(to top, var(--bg-main) 70%, transparent); }
+        /* --- INPUT AREA (Floating Bottom ala ChatGPT) --- */
+        .input-area-wrapper { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 20px 40px 20px; background: linear-gradient(to top, var(--bg-main) 70%, transparent); display: flex; flex-direction: column; align-items: center;}
+        .input-container-inner { width: 100%; max-width: 800px; display: flex; flex-direction: column; }
         
         /* Mobile Slider Toggles */
-        .toggles-container { display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin-bottom: 12px; padding-bottom: 5px;}
+        .toggles-container { display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; -webkit-overflow-scrolling: touch; margin-bottom: 12px; padding-bottom: 5px; width: 100%;}
+        .toggles-container::-webkit-scrollbar { display: none; }
         .toggle-pill { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-dim); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; flex-shrink: 0; }
         .toggle-pill.active { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); }
 
         /* Chat Input Box */
-        .chat-input-box { background: var(--bg-card); border-radius: 24px; padding: 8px 12px 8px 20px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; transition: 0.3s; }
-        .chat-input-box:focus-within { border-color: rgba(255,255,255,0.2); }
-        .platform-select { background: transparent; color: var(--text-dim); border: none; outline: none; font-size: 14px; font-weight: 500; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 10px; }
-        .platform-select option { background: var(--bg-card); color: white; }
-        .chat-input { flex-grow: 1; background: transparent; border: none; color: white; font-size: 15px; outline: none; padding: 10px 0; }
+        .chat-input-box { background: var(--bg-input); border-radius: 24px; padding: 10px 15px 10px 25px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.3s; width: 100%;}
+        .chat-input-box:focus-within { border-color: var(--accent-blue); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15); }
+        .platform-select { background: transparent; color: var(--text-dim); border: none; outline: none; font-size: 14px; font-weight: 600; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 15px; }
+        .platform-select option { background: var(--bg-sidebar); color: white; }
+        .chat-input { flex-grow: 1; background: transparent; border: none; color: white; font-size: 15px; outline: none; padding: 5px 0; }
         .chat-input::placeholder { color: #71717a; }
         
-        .send-btn { background: white; color: black; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0;}
-        .send-btn:hover { background: #d4d4d8; }
+        .send-btn { background: white; color: black; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0;}
+        .send-btn:hover { background: #d4d4d8; transform: scale(1.05); }
 
-        .loading-indicator { display: none; text-align: center; color: var(--text-dim); font-size: 13px; margin-bottom: 10px; font-weight: 500;}
-        .loading-indicator i { animation: spin 1s linear infinite; margin-right: 5px; }
+        .loading-indicator { display: none; text-align: center; color: var(--text-dim); font-size: 13px; margin-bottom: 15px; font-weight: 500;}
+        .loading-indicator i { animation: spin 1s linear infinite; margin-right: 8px; color: var(--accent-blue); }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- PDF HIDDEN CONTAINER --- */
+        /* --- PDF HIDDEN CONTAINER (Pure Text, White BG) --- */
         #pdf-secret-container { position: absolute; left: -9999px; top: 0; width: 800px; background: white; color: black; padding: 40px; box-sizing: border-box; z-index: -1; font-family: sans-serif; }
 
         @media (max-width: 768px) {
@@ -146,9 +162,12 @@
             .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; }
             .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
             .sidebar-overlay.active { display: block; opacity: 1; }
-            .display-area { padding: 20px 5% 20px 5%; }
-            .input-area-wrapper { padding: 10px 5% 20px 5%; }
+            .display-area { padding: 20px 0 160px 0; }
+            .input-area-wrapper { padding: 10px 15px 20px 15px; }
             .user-bubble { max-width: 90%; }
+            .chat-row { padding: 0 15px; }
+            .platform-select { padding-right: 10px; font-size: 13px;}
+            .chat-input-box { padding: 8px 10px 8px 15px; }
         }
     </style>
 </head>
@@ -159,7 +178,7 @@
     <div id="auth-screen">
         <div class="auth-card">
             <h2><i class="fa-solid fa-bolt"></i> Trendy AI</h2>
-            <p>Ruang kerja cerdas untuk riset pasar. Silakan isi data sesi Anda.</p>
+            <p>Silakan isi data untuk memulai sesi analisis riset pasar Anda.</p>
             <input type="text" id="guest-name" class="auth-input" placeholder="Nama Lengkap / Panggilan" required>
             <input type="text" id="guest-region" class="auth-input" placeholder="Asal Daerah (Cth: Bogor)" required>
             <select id="guest-has-business" class="auth-select" onchange="toggleBusinessInput()">
@@ -197,28 +216,30 @@
                 <div class="welcome-wrapper" id="welcome-msg">
                     <i class="fa-solid fa-brain"></i>
                     <h1>Trendy Intelligence</h1>
-                    <p>Tentukan tren, pilih jenis analisis di bawah, dan dapatkan strategi pemasaran instan ala Gen-Z.</p>
+                    <p>Tentukan tren pasar, pilih jenis analisis yang kamu butuhkan di bawah, dan dapatkan strategi instan.</p>
                 </div>
             </div>
 
             <div class="input-area-wrapper">
-                <div class="loading-indicator" id="loading-overlay"><i class="fa-solid fa-spinner"></i> Menganalisis data...</div>
-                
-                <div class="toggles-container">
-                    <button class="toggle-pill active" id="toggle-content" onclick="this.classList.toggle('active')"><i class="fa-solid fa-video"></i> Ide Konten</button>
-                    <button class="toggle-pill active" id="toggle-sales" onclick="this.classList.toggle('active')"><i class="fa-solid fa-tags"></i> Strategi Jualan</button>
-                    <button class="toggle-pill" id="toggle-research" onclick="this.classList.toggle('active')"><i class="fa-solid fa-chart-line"></i> Research Penjualan</button>
-                    <button class="toggle-pill" id="toggle-image" onclick="this.classList.toggle('active')"><i class="fa-solid fa-image"></i> Visual AI</button>
-                </div>
+                <div class="input-container-inner">
+                    <div class="loading-indicator" id="loading-overlay"><i class="fa-solid fa-spinner"></i> Sedang meracik strategi...</div>
+                    
+                    <div class="toggles-container">
+                        <button class="toggle-pill active" id="toggle-content" onclick="this.classList.toggle('active')"><i class="fa-solid fa-video"></i> Ide Konten</button>
+                        <button class="toggle-pill active" id="toggle-sales" onclick="this.classList.toggle('active')"><i class="fa-solid fa-tags"></i> Strategi Jualan</button>
+                        <button class="toggle-pill" id="toggle-research" onclick="this.classList.toggle('active')"><i class="fa-solid fa-chart-line"></i> Research Penjualan</button>
+                        <button class="toggle-pill" id="toggle-image" onclick="this.classList.toggle('active')"><i class="fa-solid fa-image"></i> Visual AI</button>
+                    </div>
 
-                <div class="chat-input-box">
-                    <select id="input-platform" class="platform-select">
-                        <option value="TikTok">TikTok</option>
-                        <option value="Instagram">Instagram</option>
-                        <option value="Twitter">X / Twitter</option>
-                    </select>
-                    <input type="text" id="input-topic" class="chat-input" placeholder="Ketik topik tren (misal: Roti Lumer)..." autocomplete="off" onkeypress="handleEnter(event)">
-                    <button class="send-btn" onclick="processAnalysis()"><i class="fa-solid fa-arrow-up"></i></button>
+                    <div class="chat-input-box">
+                        <select id="input-platform" class="platform-select">
+                            <option value="TikTok">TikTok</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Twitter">X / Twitter</option>
+                        </select>
+                        <input type="text" id="input-topic" class="chat-input" placeholder="Ketik topik tren (misal: Roti Lumer)..." autocomplete="off" onkeypress="handleEnter(event)">
+                        <button class="send-btn" onclick="processAnalysis()"><i class="fa-solid fa-arrow-up"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -227,7 +248,7 @@
     <div id="pdf-secret-container"></div>
 
     <script>
-        // --- KONFIGURASI ---
+        // --- KONFIGURASI SUPABASE & API ---
         const supabaseUrl = 'https://cidccxpjstqnpisuxkcm.supabase.co'; 
         const supabaseKey = 'sb_publishable_CM0leWbXShfwZ9riFphpYQ_r7kRQUPm'; 
         const geminiApiKey = 'AIzaSyA4qZIpPpl4SItjhzZ2yPhzkxhis24wF10'; 
@@ -262,7 +283,7 @@
 
         function handleEnter(e) { if (e.key === 'Enter') processAnalysis(); }
 
-        // MENGHAPUS LAYAR = TOPIK BARU
+        // TOPIK BARU = CLEAR SCREEN
         function startNewChat() {
             const displayArea = document.getElementById('display-area');
             displayArea.innerHTML = `
@@ -277,6 +298,7 @@
             if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
                 toggleSidebar();
             }
+            displayArea.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // --- GUEST MANAGEMENT ---
@@ -308,7 +330,7 @@
             setTimeout(() => {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'block';
-                showToast("Sesi dimulai, siap menganalisis!");
+                showToast("Selamat datang, " + name + "!");
                 fetchHistory();
             }, 400);
         }
@@ -338,24 +360,27 @@
         function endSession() { localStorage.removeItem('trendy_guest'); location.reload(); }
         window.onload = checkSession;
 
-        // --- PDF EXPORT (TEXT ONLY & RAPI) ---
+        // --- PDF EXPORT (TEXT ONLY, WHITE BG, CLEAN LAYOUT) ---
         function downloadPDF(reportId, topicName) {
             showToast("Menyiapkan dokumen PDF...");
             const reportElement = document.getElementById(reportId);
             const secretContainer = document.getElementById('pdf-secret-container');
             
-            // Membangun HTML Bersih khusus untuk PDF
-            let cleanHtml = `<div style="padding: 20px; font-family: sans-serif; color: black; line-height: 1.5;">`;
-            cleanHtml += `<h1 style="border-bottom: 2px solid #ccc; padding-bottom: 10px; font-size: 24px; margin-bottom: 20px;">Laporan Trendy AI: ${topicName}</h1>`;
+            // Build Clean HTML specifically for PDF
+            const dateStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            let cleanHtml = `<div style="padding: 10px; font-family: Helvetica, Arial, sans-serif; color: #111; line-height: 1.6;">`;
+            cleanHtml += `<h1 style="border-bottom: 2px solid #3b82f6; padding-bottom: 10px; font-size: 24px; margin-bottom: 5px; color: #111;">Laporan Trendy AI: ${topicName}</h1>`;
+            cleanHtml += `<p style="font-size: 12px; color: #555; margin-top: 0; margin-bottom: 30px;">Disusun untuk: ${guestData.name} | Tanggal: ${dateStr}</p>`;
             
             const sections = reportElement.querySelectorAll('.ai-section');
             sections.forEach(sec => {
                 const titleEl = sec.querySelector('.section-label');
                 const bodyEl = sec.querySelector('.content-body');
-                if (titleEl && bodyEl && !titleEl.innerText.includes('Visual')) {
-                    cleanHtml += `<div style="margin-bottom: 20px; page-break-inside: avoid;">`;
-                    cleanHtml += `<h3 style="color: #3b82f6; font-size: 16px; margin-bottom: 8px; text-transform: uppercase;">${titleEl.innerText}</h3>`;
-                    cleanHtml += `<div style="font-size: 14px; color: #333;">${bodyEl.innerHTML}</div>`;
+                // Abaikan bagian visual/gambar
+                if (titleEl && bodyEl && !titleEl.innerText.toLowerCase().includes('visual')) {
+                    cleanHtml += `<div style="margin-bottom: 25px; page-break-inside: avoid; border-left: 4px solid #e5e7eb; padding-left: 15px;">`;
+                    cleanHtml += `<h3 style="color: #3b82f6; font-size: 16px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">${titleEl.innerText}</h3>`;
+                    cleanHtml += `<div style="font-size: 13px; color: #333;">${bodyEl.innerHTML}</div>`;
                     cleanHtml += `</div>`;
                 }
             });
@@ -363,13 +388,17 @@
             secretContainer.innerHTML = cleanHtml;
 
             const opt = {
-                margin: 15, filename: `TrendyAI_${topicName.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, backgroundColor: '#ffffff' },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                margin:       15,
+                filename:     `TrendyAI_${topicName.replace(/\s+/g, '_')}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'] }
             };
+            
             html2pdf().set(opt).from(secretContainer).save().then(() => {
-                showToast("PDF Berhasil Diunduh!"); secretContainer.innerHTML = ''; 
+                showToast("PDF Berhasil Diunduh!"); 
+                secretContainer.innerHTML = ''; 
             });
         }
 
@@ -377,83 +406,114 @@
         function formatMarkdown(text) {
             if (!text) return "";
             let f = text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/###/g, '').replace(/##/g, '');
-            f = f.replace(/^[\-\•]\s+(.*)$/gm, '<ul style="margin-left:20px;"><li>$1</li></ul>');
+            // List item formatting
+            f = f.replace(/^[\-\•]\s+(.*)$/gm, '<ul style="margin-top:5px; margin-bottom:5px;"><li>$1</li></ul>');
             f = f.replace(/\n/g, '<br>');
             f = f.replace(/<\/ul><br><ul[^>]*>/g, '');
             return f.trim();
         }
 
         function extractSection(text, tag) {
-            const regex = new RegExp(`\\${tag}([\\s\\S]*?)(?=\\[[A-Z]+\\]|$)`, 'i');
-            const match = text.match(regex);
-            return match ? match[1].trim() : '';
+            const r = new RegExp(`\\${tag}([\\s\\S]*?)(?=\\[[A-Z]+\\]|$)`, 'i');
+            const m = text.match(r);
+            return m ? m[1].trim() : '';
         }
 
-        // --- CHAT RENDERER ---
+        // --- CHAT UI RENDERER ---
         function renderResultToDisplay(topic, platform, aiText, isHistoryClick = false, isVisualRequested = false) {
             const area = document.getElementById('display-area');
             const welcome = document.getElementById('welcome-msg');
             if (welcome) welcome.style.display = 'none';
 
+            const toggleContent = document.getElementById('toggle-content').classList.contains('active');
+            const toggleSales = document.getElementById('toggle-sales').classList.contains('active');
+            const toggleResearch = document.getElementById('toggle-research').classList.contains('active');
+            
             const showVisual = isHistoryClick ? aiText.includes('[IMAGEPROMPT]') : isVisualRequested;
+            const showAnalisis = true; 
+            const showResearch = isHistoryClick ? aiText.includes('[RESEARCH]') : toggleResearch;
+            const showKonten = isHistoryClick ? aiText.includes('[KONTEN]') : toggleContent;
+            const showJualan = isHistoryClick ? aiText.includes('[JUALAN]') : toggleSales;
+            
             const reportId = 'report_' + Math.random().toString(36).substr(2, 9);
             
-            // 1. User Message Bubble (Hanya muncul jika bukan klik dari history, agar terasa seperti chat baru)
             let chatHtml = '';
+
+            // User Bubble (Hanya tampil saat prompt baru, bukan klik history)
             if (!isHistoryClick) {
-                chatHtml += `<div class="chat-row"><div class="user-bubble">Tolong analisis tren <strong>${topic}</strong> di ${platform}.</div></div>`;
+                chatHtml += `
+                <div class="chat-row">
+                    <div class="user-bubble">Tolong buatkan strategi tren <strong>${topic}</strong> di ${platform}.</div>
+                </div>`;
             }
 
-            // 2. AI Response Bubble
-            chatHtml += `<div class="chat-row" id="${reportId}"><div class="ai-bubble">`;
-            chatHtml += `
-                <div class="ai-header">
-                    <div class="ai-title"><i class="fa-solid fa-bolt"></i> Trendy Intelligence</div>
-                    <button class="pdf-btn" onclick="downloadPDF('${reportId}', '${topic}')"><i class="fa-solid fa-download"></i> PDF</button>
-                </div>
+            // AI Bubble
+            chatHtml += `<div class="chat-row" id="${reportId}">
+                <div class="ai-bubble">
+                    <div class="ai-header">
+                        <div class="ai-title"><i class="fa-solid fa-bolt"></i> Trendy Intelligence</div>
+                        <button class="pdf-btn" onclick="downloadPDF('${reportId}', '${topic}')"><i class="fa-solid fa-download"></i> PDF</button>
+                    </div>
             `;
 
+            // Sections
             const sectionsData = [
-                { tag: '[ANALISIS]', title: 'Analisis Singkat', icon: 'fa-magnifying-glass', color: 'color-analisis' },
-                { tag: '[RESEARCH]', title: 'Research Penjualan', icon: 'fa-chart-line', color: 'color-research' },
-                { tag: '[KONTEN]', title: 'Ide Konten', icon: 'fa-video', color: 'color-konten' },
-                { tag: '[JUALAN]', title: 'Strategi Jualan', icon: 'fa-tags', color: 'color-sales' }
+                { tag: '[ANALISIS]', title: 'Analisis Tren', icon: 'fa-magnifying-glass-chart', colorClass: 'card-analisis', textClass: 'color-analisis', show: showAnalisis },
+                { tag: '[RESEARCH]', title: 'Research Penjualan', icon: 'fa-chart-line', colorClass: 'card-research', textClass: 'color-research', show: showResearch },
+                { tag: '[KONTEN]', title: 'Ide Konten Viral', icon: 'fa-video', colorClass: 'card-konten', textClass: 'color-konten', show: showKonten },
+                { tag: '[JUALAN]', title: 'Strategi Konversi', icon: 'fa-tags', colorClass: 'card-sales', textClass: 'color-sales', show: showJualan }
             ];
 
             let hasParsedData = false;
             sectionsData.forEach(sec => {
                 const content = extractSection(aiText, sec.tag);
-                if (content) {
+                if (content && sec.show) {
                     hasParsedData = true;
-                    chatHtml += `<div class="ai-section"><div class="section-label ${sec.color}"><i class="fa-solid ${sec.icon}"></i> ${sec.title}</div><div class="content-body">${formatMarkdown(content)}</div></div>`;
+                    chatHtml += `
+                        <div class="ai-card ${sec.colorClass}">
+                            <div class="section-label ${sec.textClass}"><i class="fa-solid ${sec.icon}"></i> ${sec.title}</div>
+                            <div class="content-body">${formatMarkdown(content)}</div>
+                        </div>
+                    `;
                 }
             });
 
             // Fallback unformatted text
             if (!hasParsedData && aiText.trim().length > 10) {
-                 chatHtml += `<div class="ai-section"><div class="content-body">${formatMarkdown(aiText)}</div></div>`;
+                 chatHtml += `<div class="ai-card card-analisis"><div class="content-body">${formatMarkdown(aiText)}</div></div>`;
             }
 
             // Visual AI
             if (showVisual) {
                 let safePrompt = encodeURIComponent(topic.replace(/[^a-zA-Z0-9\s]/g, '') + " aesthetic modern minimalist product photography");
                 let imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=450&nologo=true&seed=${Math.floor(Math.random()*100000)}`;
-                chatHtml += `<div class="ai-section"><div class="section-label color-visual"><i class="fa-solid fa-image"></i> Visual AI</div><img src="${imgUrl}" class="visual-img"></div>`;
+                chatHtml += `
+                    <div class="ai-card card-visual">
+                        <div class="section-label color-visual"><i class="fa-solid fa-image"></i> Visual AI</div>
+                        <img src="${imgUrl}" class="visual-img" onerror="this.style.display='none'">
+                    </div>
+                `;
             }
 
-            chatHtml += `</div></div>`; // End AI Bubble & Row
+            chatHtml += `</div></div>`; 
             
-            if (isHistoryClick) { area.innerHTML = chatHtml; } 
-            else { area.insertAdjacentHTML('beforeend', chatHtml); }
+            // JIKA KLIK HISTORY -> TIMPA LAYAR. JIKA PROMPT BARU -> APPEND KE BAWAH (Continuous)
+            if (isHistoryClick) { 
+                area.innerHTML = chatHtml; 
+            } else { 
+                area.insertAdjacentHTML('beforeend', chatHtml); 
+            }
             
-            setTimeout(() => { area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' }); }, 100);
+            setTimeout(() => { area.scrollTo({ top: area.scrollHeight, behavior: 'smooth' }); }, 150);
             if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) toggleSidebar();
         }
 
         // --- HYBRID AI ENGINE ---
         async function fetchAIResponse(prompt) {
+            // TRY 1: GEMINI (v1 Stable)
             try {
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+                console.log("Mencoba Gemini...");
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
@@ -461,6 +521,7 @@
                 if (data.candidates) return { source: 'Gemini', text: data.candidates[0].content.parts[0].text };
             } catch (e) { console.warn("Gemini limit, pindah Groq..."); }
 
+            // TRY 2: GROQ (Llama 3.1)
             const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
@@ -471,7 +532,7 @@
             throw new Error("Server AI Sibuk.");
         }
 
-        // --- MAIN LOGIC ---
+        // --- MAIN LOGIC (SMART CACHE) ---
         async function processAnalysis() {
             if (!guestData || !guestData.id) return showToast("Sesi habis!", "error");
 
@@ -490,7 +551,7 @@
             document.getElementById('loading-overlay').style.display = 'block';
 
             try {
-                // 1. SMART CACHE
+                // 1. SMART CACHE DARI SUPABASE (Bisa dari user manapun)
                 const { data: allCache } = await supabaseClient.from('trends_data').select('*').eq('platform', platform).order('created_at', { ascending: false });
                 let existingEntry = null;
                 let exData = { analisis: '', konten: '', jualan: '', research: '', imageprompt: '' };
@@ -512,6 +573,7 @@
                     }
                 }
 
+                // Cek apakah data dari cache sudah cukup memenuhi yang dicentang user
                 let reqA = true && !exData.analisis; 
                 let reqC = isContent && !exData.konten;
                 let reqS = isSales && !exData.jualan;
@@ -519,6 +581,7 @@
                 let reqI = isImage && !exData.imageprompt;
 
                 if (!reqA && !reqC && !reqS && !reqR && !reqI && existingEntry) {
+                    // CACHE LENGKAP
                     document.getElementById('loading-overlay').style.display = 'none';
                     let disp = '';
                     if (exData.analisis) disp += `\n[ANALISIS]\n${exData.analisis}\n`;
@@ -529,32 +592,35 @@
 
                     renderResultToDisplay(topic, platform, disp, false, isImage);
 
+                    // Tambah ke history user jika dia menggunakan data hasil prompt user lain
                     if (existingEntry.user_id !== guestData.id) {
-                        await supabaseClient.from('trends_data').insert([{ platform: existingEntry.platform, trending_topic: existingEntry.trending_topic, ai_suggestion: disp, user_id: guestData.id }]);
+                        await supabaseClient.from('trends_data').insert([{ platform, trending_topic: topic, ai_suggestion: disp, user_id: guestData.id }]);
                         fetchHistory();
                     }
                     document.getElementById('input-topic').value = '';
                     return; 
                 }
 
-                // 2. FETCH AI
+                // 2. FETCH AI (JIKA CACHE KOSONG / KURANG)
                 let prompt = `Sebagai pakar digital marketing, analisis tren "${topic}" di platform ${platform} untuk bisnis: ${business}.
                 DILARANG menggunakan simbol bintang (*) atau hashtag (#). Gunakan format list bullet berupa strip (-).
                 HANYA berikan respons untuk tag di bawah ini:\n`;
+                
                 if (reqA) prompt += `\n[ANALISIS]\nPenjelasan 2 kalimat mengapa topik ini viral.\n`;
-                if (reqR) prompt += `\n[RESEARCH]\nAnalisis potensi minat pasar, bahan baku, atau peluang usaha.\n`;
-                if (reqC) prompt += `\n[KONTEN]\n2 ide video viral "out of the box" (Sebutkan Hook & Visual).\n`;
+                if (reqR) prompt += `\n[RESEARCH]\nAnalisis singkat minat pasar dan bahan baku.\n`;
+                if (reqC) prompt += `\n[KONTEN]\n2 ide video viral (Sebutkan Hook & Visual).\n`;
                 if (reqS) prompt += `\n[JUALAN]\n1 strategi promo/CTA yang memancing FOMO.\n`;
                 if (reqI) prompt += `\n[IMAGEPROMPT]\nOK\n`;
 
                 const ai = await fetchAIResponse(prompt);
                 const txt = ai.text;
 
+                // GABUNG CACHE LAMA & HASIL AI BARU
                 let cFinal = '';
                 cFinal += `\n[ANALISIS]\n${exData.analisis || extractSection(txt, '[ANALISIS]')}\n`;
+                if (reqR || exData.research) cFinal += `\n[RESEARCH]\n${exData.research || extractSection(txt, '[RESEARCH]')}\n`;
                 if (reqC || exData.konten) cFinal += `\n[KONTEN]\n${exData.konten || extractSection(txt, '[KONTEN]')}\n`;
                 if (reqS || exData.jualan) cFinal += `\n[JUALAN]\n${exData.jualan || extractSection(txt, '[JUALAN]')}\n`;
-                if (reqR || exData.research) cFinal += `\n[RESEARCH]\n${exData.research || extractSection(txt, '[RESEARCH]')}\n`;
                 if (reqI || exData.imageprompt) cFinal += `\n[IMAGEPROMPT]\nOK\n`;
                 
                 document.getElementById('loading-overlay').style.display = 'none';
@@ -566,7 +632,7 @@
                     await supabaseClient.from('trends_data').insert([{ platform, trending_topic: topic, ai_suggestion: cFinal, user_id: guestData.id }]);
                 }
                 
-                fetchHistory();
+                fetchHistory(); // Perbarui history instan
                 document.getElementById('input-topic').value = '';
 
             } catch (e) {
@@ -585,7 +651,7 @@
                     const div = document.createElement('div');
                     div.className = 'history-item';
                     div.onclick = () => renderResultToDisplay(item.trending_topic, item.platform, item.ai_suggestion, true);
-                    div.innerHTML = `<div class="history-text"><i class="fa-regular fa-comment"></i> <span>${item.trending_topic}</span></div><i class="fa-solid fa-trash delete-btn" onclick="event.stopPropagation(); deleteChat(${item.id})"></i>`;
+                    div.innerHTML = `<div class="history-text"><i class="fa-regular fa-message"></i> <span>${item.trending_topic}</span></div><i class="fa-solid fa-trash delete-btn" onclick="event.stopPropagation(); deleteChat(${item.id})"></i>`;
                     list.appendChild(div);
                 });
             }
@@ -595,7 +661,6 @@
             if(confirm("Hapus histori?")) {
                 await supabaseClient.from('trends_data').delete().eq('id', id);
                 fetchHistory();
-                startNewChat(); // clear screen
             }
         }
     </script>
