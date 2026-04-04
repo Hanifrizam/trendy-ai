@@ -31,7 +31,7 @@
             color: var(--text-main);
             display: flex;
             height: 100vh;
-            height: 100dvh; /* Mobile viewport fix */
+            height: 100dvh;
             overflow: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -45,16 +45,18 @@
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-20px); } }
 
         /* --- GUEST FORM SCREEN --- */
-        #auth-screen { position: fixed; inset: 0; background: radial-gradient(circle at center, #18181b, #09090b); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.5s ease; }
-        .auth-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid var(--border-color); padding: 50px 40px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); animation: floatUp 0.6s ease forwards; }
+        #auth-screen { position: fixed; inset: 0; background: radial-gradient(circle at center, #18181b, #09090b); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.5s ease; overflow-y: auto; padding: 20px;}
+        .auth-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid var(--border-color); padding: 40px 35px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateY(20px); animation: floatUp 0.6s ease forwards; margin: auto;}
         @keyframes floatUp { to { transform: translateY(0); opacity: 1; } from { transform: translateY(20px); opacity: 0; } }
         .auth-card h2 { margin-bottom: 10px; color: var(--text-main); font-size: 28px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .auth-card h2 i { color: var(--accent-blue); }
-        .auth-card p { color: var(--text-dim); font-size: 15px; margin-bottom: 35px; line-height: 1.5; }
-        .auth-input, .auth-select { width: 100%; padding: 15px 20px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; border-radius: 12px; outline: none; font-size: 14px; transition: all 0.3s; }
+        .auth-card p { color: var(--text-dim); font-size: 14px; margin-bottom: 30px; line-height: 1.5; }
+        
+        .input-group { display: flex; gap: 10px; }
+        .auth-input, .auth-select { width: 100%; padding: 14px 18px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; border-radius: 12px; outline: none; font-size: 14px; transition: all 0.3s; }
         .auth-input:focus, .auth-select:focus { border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
         .auth-select option { background: var(--bg-dark); color: white; }
-        .auth-btn { width: 100%; padding: 15px; background: var(--accent-blue); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; margin-bottom: 15px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
+        .auth-btn { width: 100%; padding: 15px; background: var(--accent-blue); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; margin-bottom: 5px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); }
         .auth-btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
 
         /* --- APP CONTAINER --- */
@@ -62,7 +64,7 @@
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 99; opacity: 0; transition: opacity 0.3s; }
 
         /* --- SIDEBAR --- */
-        .sidebar { width: 280px; background-color: var(--sidebar-bg); display: flex; flex-direction: column; padding: 20px 0; border-right: 1px solid var(--border-color); flex-shrink: 0; z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar { width: 280px; background-color: var(--sidebar-bg); display: flex; flex-direction: column; padding: 20px 0; border-right: 1px solid var(--border-color); flex-shrink: 0; z-index: 100; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .sidebar-header { font-size: 20px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--text-main); padding: 0 20px; }
         .sidebar-header i { color: var(--accent-blue); }
         
@@ -174,8 +176,11 @@
         /* --- MOBILE RESPONSIVENESS & SLIDER --- */
         @media (max-width: 768px) {
             .mobile-header { display: flex; }
-            .sidebar { position: fixed; left: -100%; top: 0; bottom: 0; }
-            .sidebar.active { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.7); }
+            
+            /* UPDATE: Animasi Sidebar diubah pakai Transform GPU agar super halus */
+            .sidebar { position: fixed; left: 0; transform: translateX(-100%); top: 0; bottom: 0; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+            .sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.7); }
+            
             .sidebar-overlay.active { display: block; opacity: 1; }
             
             .display-area { padding: 20px 5% 140px 5%; }
@@ -210,6 +215,13 @@
             <p>Ruang kerja cerdas untuk riset pasar. Silakan isi data sesi Anda.</p>
             
             <input type="text" id="guest-name" class="auth-input" placeholder="Nama Lengkap / Panggilan" required>
+            
+            <div class="input-group">
+                <input type="number" id="guest-age" class="auth-input" placeholder="Umur" required>
+                <input type="text" id="guest-job" class="auth-input" placeholder="Pekerjaan" required>
+            </div>
+            <input type="text" id="guest-nim" class="auth-input" placeholder="NIM (Isi '-' jika bukan mahasiswa)" required>
+            
             <input type="text" id="guest-region" class="auth-input" placeholder="Asal Daerah (Cth: Bogor)" required>
             
             <select id="guest-has-business" class="auth-select" onchange="toggleBusinessInput()">
@@ -292,8 +304,6 @@
         </div>
     </div>
 
-    <div id="pdf-secret-container" style="position: absolute; left: -9999px; top: 0; width: 800px; background-color: #09090b; color: #fafafa; padding: 30px; box-sizing: border-box; z-index: -1;"></div>
-
     <script>
         const supabaseUrl = 'https://cidccxpjstqnpisuxkcm.supabase.co'; 
         const supabaseKey = 'sb_publishable_CM0leWbXShfwZ9riFphpYQ_r7kRQUPm'; 
@@ -304,11 +314,11 @@
 
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-        let guestData = { id: '', name: '', region: '', business: '' };
+        let guestData = { id: '', name: '', age: '', job: '', nim: '', region: '', business: '' };
         
         // --- ROOM CHAT STATE ---
-        let currentChatId = null; // ID dari Supabase row saat ini
-        let chatContextHistory = []; // Array object untuk AI context
+        let currentChatId = null; 
+        let chatContextHistory = []; 
 
         // ==========================================
         // UUID GENERATOR
@@ -391,7 +401,7 @@
         // ==========================================
         function startNewChat() {
             currentChatId = null;
-            chatContextHistory = []; // Reset memori
+            chatContextHistory = []; 
             
             renderWelcomeScreen();
             
@@ -399,7 +409,6 @@
             maximizePanel();
             document.getElementById('input-topic').focus();
             
-            // Hapus status active di sidebar
             document.querySelectorAll('.history-item').forEach(el => el.classList.remove('active'));
 
             if(window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
@@ -411,10 +420,8 @@
             currentChatId = id;
             const displayArea = document.getElementById('display-area');
             
-            // Render HTML mentah dari Supabase
             displayArea.innerHTML = aiSuggestionHtml;
             
-            // Ekstrak context dari hidden div (jika ada)
             const contextDataEl = displayArea.querySelector('.chat-context-data');
             if (contextDataEl) {
                 try {
@@ -423,10 +430,9 @@
                     chatContextHistory = [];
                 }
             } else {
-                chatContextHistory = []; // Fallback
+                chatContextHistory = []; 
             }
 
-            // Update UI
             document.querySelectorAll('.history-item').forEach(el => el.classList.remove('active'));
             const activeItem = document.getElementById(`hist-${id}`);
             if(activeItem) activeItem.classList.add('active');
@@ -451,21 +457,40 @@
             else { input.style.display = 'none'; input.required = false; input.value = ''; }
         }
 
-        function startGuestSession() {
+        // UPDATE: Fungsi ini ditambahkan async untuk menunggu proses Supabase
+        async function startGuestSession() {
             const name = document.getElementById('guest-name').value.trim();
+            const age = document.getElementById('guest-age').value.trim();
+            const job = document.getElementById('guest-job').value.trim();
+            const nim = document.getElementById('guest-nim').value.trim();
             const region = document.getElementById('guest-region').value.trim();
             const hasBusiness = document.getElementById('guest-has-business').value;
             const businessName = document.getElementById('guest-business-name').value.trim();
 
-            if (!name || !region) { showToast("Nama dan Asal Daerah wajib diisi!", "error"); return; }
+            if (!name || !age || !job || !nim || !region) { showToast("Mohon lengkapi semua isian biodata!", "error"); return; }
             if (hasBusiness === 'yes' && !businessName) { showToast("Nama Usaha wajib diisi!", "error"); return; }
 
             const id = generateUUID();
             const businessText = hasBusiness === 'yes' ? businessName : 'Belum punya usaha';
 
-            guestData = { id: id, name: name, region: region, business: businessText };
-            localStorage.setItem('metan_guest', JSON.stringify(guestData));
+            guestData = { id, name, age, job, nim, region, business: businessText };
+            
+            // SIMPAN DATA KE SUPABASE PADA TABEL BARU
+            try {
+                await supabaseClient.from('guest_users').insert([{
+                    id: id,
+                    name: name,
+                    age: age,
+                    job: job,
+                    nim: nim,
+                    region: region,
+                    business: businessText
+                }]);
+            } catch (err) {
+                console.warn("Gagal simpan ke DB, tapi tetap lanjut masuk.", err);
+            }
 
+            localStorage.setItem('metan_guest', JSON.stringify(guestData));
             applyGuestData();
 
             document.getElementById('auth-screen').style.opacity = '0';
@@ -491,7 +516,7 @@
                 guestData = JSON.parse(saved);
                 if (!guestData.id || guestData.id.length !== 36 || !guestData.id.includes('-')) {
                     localStorage.removeItem('metan_guest');
-                    guestData = { id: '', name: '', region: '', business: '' };
+                    guestData = { id: '', name: '', age: '', job: '', nim: '', region: '', business: '' };
                     document.getElementById('auth-screen').style.display = 'flex';
                     document.getElementById('app-screen').style.display = 'none';
                     return;
@@ -515,47 +540,52 @@
         window.onload = checkSession; 
 
         // ==========================================
-        // PDF EXPORT
+        // PDF EXPORT FIX (ANTI-BLANK)
         // ==========================================
         function downloadChatPDF() {
             showToast("Menyiapkan dokumen PDF Chat...", "success");
             
+            // Buat kontainer khusus rendering yang tidak sepenuhnya ngumpet
             const displayArea = document.getElementById('display-area').cloneNode(true);
-            const secretContainer = document.getElementById('pdf-secret-container');
+            const secretContainer = document.createElement('div');
             
-            // Bersihkan data context dari PDF
+            secretContainer.style.background = '#09090b';
+            secretContainer.style.color = '#fafafa';
+            secretContainer.style.width = '800px';
+            secretContainer.style.padding = '20px';
+            
+            // Bersihkan data context json & tombol pdf
             const contextData = displayArea.querySelector('.chat-context-data');
             if(contextData) contextData.remove();
-
+            
             secretContainer.innerHTML = displayArea.innerHTML;
             
-            // Fix CSS buat html2pdf
-            const cards = secretContainer.querySelectorAll('.ai-card, .user-bubble');
+            const btns = secretContainer.querySelectorAll('.pdf-btn');
+            btns.forEach(b => b.remove());
+            
+            // Matikan animasi CSS yg mengganggu html2canvas
+            const cards = secretContainer.querySelectorAll('.ai-card, .user-bubble, .chat-turn');
             cards.forEach(card => {
                 card.style.transform = 'none';
                 card.style.animation = 'none';
                 card.style.pageBreakInside = 'avoid';
                 card.style.breakInside = 'avoid';
             });
-            
-            const btns = secretContainer.querySelectorAll('.pdf-btn');
-            btns.forEach(b => b.style.display = 'none');
 
             const opt = {
-                margin:       15,
+                margin:       10,
                 filename:     `TrendyAI_Chat_Report.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#09090b', windowWidth: 800 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
+            // Langsung pass object secretContainer ke html2pdf
             html2pdf().set(opt).from(secretContainer).save().then(() => {
                 showToast("PDF Berhasil Diunduh!", "success");
-                secretContainer.innerHTML = ''; 
             }).catch(err => {
                 console.error(err);
                 showToast("Gagal memproses PDF", "error");
-                secretContainer.innerHTML = '';
             });
         }
 
@@ -586,7 +616,6 @@
         // HYBRID AI LOGIC (CONTEXT AWARE)
         // ==========================================
         async function fetchAIResponse(messagesArray) {
-            // Coba Groq Llama 3.1 terlebih dahulu untuk chat berantai yang lebih luwes
             try {
                 console.log("Mencoba Groq (Llama 3.1)...");
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -606,7 +635,6 @@
                 console.warn("Groq limit/error, otomatis beralih ke Gemini...", e);
             }
 
-            // Fallback Gemini
             console.log("Mencoba Gemini 1.5 Flash...");
             const geminiContents = messagesArray.map(msg => ({
                 role: msg.role === 'assistant' ? 'model' : 'user',
@@ -652,7 +680,6 @@
             const welcomeMsg = document.querySelector('.welcome-wrapper');
             if (welcomeMsg) welcomeMsg.remove();
 
-            // Tombol PDF Header (hanya dirender sekali di awal room)
             if(!displayArea.querySelector('.chat-report-wrapper')) {
                 const headerHtml = `
                     <div class="chat-report-wrapper">
@@ -688,7 +715,6 @@
             try {
                 showLoading("AI sedang mengetik...");
 
-                // 2. LOGIKA CACHE GLOBAL (Hanya berlaku untuk prompt PERTAMA di room baru)
                 let existingData = { analisis: '', konten: '', jualan: '', research: '', imageprompt: '' };
                 let foundCache = false;
 
@@ -720,7 +746,6 @@
 
                 let finalAiResponse = "";
 
-                // Jika Cache Lengkap
                 if (!needsAnalisis && !needsKonten && !needsJualan && !needsResearch && !needsImage && foundCache) {
                     if (existingData.analisis) finalAiResponse += `\n[ANALISIS]\n${existingData.analisis}\n`;
                     if (existingData.research) finalAiResponse += `\n[RESEARCH]\n${existingData.research}\n`;
@@ -729,7 +754,6 @@
                     if (existingData.imageprompt) finalAiResponse += `\n[IMAGEPROMPT]\n${existingData.imageprompt}\n`;
                     showToast("Dimuat dari Database Global!", "success");
                 } else {
-                    // PANGGIL AI dengan KONTEKS
                     let promptInstruction = `Sebagai pakar digital marketing, jawab / analisis permintaan user terkait topik "${topic}" di platform ${platform}, fokuskan untuk bisnis: ${business}. Jangan gunakan format markdown hash (#) atau bintang (*), gunakan strip (-) biasa.`;
                     
                     if (needsAnalisis) promptInstruction += `\n[ANALISIS]\nBerikan jawaban utama / analisis tren.\n`;
@@ -738,30 +762,24 @@
                     if (needsJualan) promptInstruction += `\n[JUALAN]\nBerikan strategi jualan.\n`;
                     if (needsImage) promptInstruction += `\n[IMAGEPROMPT]\nOK\n`;
 
-                    // Masukkan ke array chat memory
-                    // Untuk instruction ini, kita jadikan system/user prompt.
-                    // Supaya AI tahu konteks dari chat sebelumnya.
                     if (chatContextHistory.length === 0) {
                         chatContextHistory.push({ role: "user", content: promptInstruction });
                     } else {
-                        // Lanjutkan obrolan
                         chatContextHistory.push({ role: "user", content: `Konteks sebelumnya masih sama (Bisnis: ${business}, Platform: ${platform}). Pertanyaan/Topik lanjutan dari user: "${topic}". Tolong jawab menggunakan struktur tag KOTAK seperti sebelumnya jika memungkinkan, atau jawab natural di dalam [ANALISIS].\n\n` + promptInstruction });
                     }
 
                     const aiResult = await fetchAIResponse(chatContextHistory);
                     const aiTextResponse = aiResult.text;
 
-                    // Simpan balasan AI ke memory
                     chatContextHistory.push({ role: "assistant", content: aiTextResponse });
 
-                   // --- PARSING SUPER AMAN (ANTI-BLANK) ---
+                    // --- PARSING SUPER AMAN (ANTI-BLANK) ---
                     let newAnalisis = '';
                     let newResearch = '';
                     let newKonten = '';
                     let newJualan = '';
                     let newImage = '';
 
-                    // Cek apakah AI mematuhi format tag resmi kita
                     const hasOfficialTags = aiTextResponse.includes('[ANALISIS]') || aiTextResponse.includes('[KONTEN]') || aiTextResponse.includes('[JUALAN]') || aiTextResponse.includes('[RESEARCH]');
 
                     if (hasOfficialTags) {
@@ -771,13 +789,10 @@
                         newJualan = aiTextResponse.includes('[JUALAN]') ? extractSection(aiTextResponse, '[JUALAN]') : '';
                         newImage = aiTextResponse.includes('[IMAGEPROMPT]') ? extractSection(aiTextResponse, '[IMAGEPROMPT]') : '';
                         
-                        // Fallback: Jika AI kasih intro text sebelum tag
                         if (!newAnalisis && aiTextResponse.indexOf('[') > 0) {
                             newAnalisis = aiTextResponse.substring(0, aiTextResponse.indexOf('[')).trim();
                         }
                     } else {
-                        // JIKA AI MENJAWAB NATURAL (Sering terjadi di obrolan lanjutan)
-                        // Kita dump jawaban naturalnya ke dalam Card yang sedang diaktifkan user
                         if (isContent && !isSales && !isResearch) {
                             newKonten = aiTextResponse;
                         } else if (isSales && !isContent && !isResearch) {
@@ -785,7 +800,7 @@
                         } else if (isResearch && !isContent && !isSales) {
                             newResearch = aiTextResponse;
                         } else {
-                            newAnalisis = aiTextResponse; // Default dump
+                            newAnalisis = aiTextResponse; 
                         }
                     }
 
@@ -794,7 +809,6 @@
                     if (existingData.konten || newKonten) finalAiResponse += `\n[KONTEN]\n${existingData.konten || newKonten}\n`;
                     if (existingData.jualan || newJualan) finalAiResponse += `\n[JUALAN]\n${existingData.jualan || newJualan}\n`;
                     if (existingData.imageprompt || newImage) finalAiResponse += `\n[IMAGEPROMPT]\n${existingData.imageprompt || newImage}\n`;
-                    // --- AKHIR PARSING ---
                     
                     showToast(`Prompt Terbuat!`, "success");
                 }
@@ -840,25 +854,21 @@
                 let oldContext = displayArea.querySelector('.chat-context-data');
                 if(oldContext) oldContext.remove();
                 
-                // Embed context history untuk di-load ulang nanti
                 const contextDiv = document.createElement('div');
                 contextDiv.className = 'chat-context-data';
                 contextDiv.style.display = 'none';
                 contextDiv.textContent = JSON.stringify(chatContextHistory);
                 displayArea.appendChild(contextDiv);
 
-                // Dapatkan full HTML untuk disimpan
                 const fullRoomHtml = displayArea.innerHTML;
                 let titleTopic = topic.length > 25 ? topic.substring(0,25) + '...' : topic;
 
                 if (currentChatId) {
-                    // Update room existing
                     await supabaseClient.from('trends_data').update({ ai_suggestion: fullRoomHtml }).eq('id', currentChatId);
                 } else {
-                    // Bikin room baru
                     const { data, error } = await supabaseClient.from('trends_data').insert([{ 
                         platform, 
-                        trending_topic: titleTopic, // Topic pertama jadi judul room
+                        trending_topic: titleTopic,
                         ai_suggestion: fullRoomHtml,
                         user_id: guestData.id 
                     }]).select();
@@ -869,7 +879,7 @@
                 }
                 
                 hideLoading();
-                fetchHistory(); // Refresh Sidebar
+                fetchHistory();
                 setTimeout(() => { displayArea.scrollTo({ top: displayArea.scrollHeight, behavior: 'smooth' }); minimizePanel(); }, 300);
 
             } catch (e) {
@@ -901,7 +911,6 @@
                         historyItem.className = `history-item ${item.id === currentChatId ? 'active' : ''}`;
                         historyItem.id = `hist-${item.id}`;
                         historyItem.onclick = () => {
-                            // Escape HTML data properly by passing raw param
                             loadChatRoom(item.id, item.ai_suggestion);
                         };
                         historyItem.innerHTML = `
@@ -922,7 +931,7 @@
         async function deleteChat(id) {
             if(confirm("Yakin ingin menghapus obrolan ini?")) {
                 await supabaseClient.from('trends_data').delete().eq('id', id);
-                if(currentChatId === id) startNewChat(); // Jika yang dihapus sedang dibuka
+                if(currentChatId === id) startNewChat(); 
                 showToast("Histori dihapus", "success");
                 fetchHistory();
             }
