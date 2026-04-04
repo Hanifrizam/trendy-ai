@@ -41,6 +41,7 @@
         .toast { background: rgba(20, 20, 25, 0.95); backdrop-filter: blur(10px); color: white; padding: 16px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-left: 4px solid var(--accent-blue); transform: translateX(120%); animation: slideInToast 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; display: flex; align-items: center; gap: 12px; }
         .toast.error { border-left-color: #ef4444; }
         .toast.success { border-left-color: #10b981; }
+        .toast.info { border-left-color: var(--accent-purple); }
         @keyframes slideInToast { to { transform: translateX(0); } }
         @keyframes fadeOutToast { to { opacity: 0; transform: translateY(-20px); } }
 
@@ -121,12 +122,14 @@
         .pdf-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; }
         .pdf-btn:hover { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.4); color: #ef4444; }
 
-        .ai-card { background: #121214; border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .ai-card { background: #121214; border-radius: 20px; padding: 25px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; overflow: hidden;}
         .card-analisis { border-left: 4px solid var(--accent-blue); }
         .card-konten { border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(to right, rgba(168,85,247,0.05), #121214); }
         .card-sales { border: 1px dashed rgba(16, 185, 129, 0.5); background: linear-gradient(to right, rgba(16,185,129,0.05), #121214); }
         .card-research { border: 1px solid rgba(245, 158, 11, 0.3); background: linear-gradient(to right, rgba(245,158,11,0.05), #121214); }
         .card-visual { border: 1px solid var(--border-color); background: #121214;}
+
+        .db-badge { position: absolute; top: 0; right: 0; background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); font-size: 10px; padding: 4px 10px; border-bottom-left-radius: 10px; font-weight: 700; letter-spacing: 0.5px;}
 
         .section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
         .section-title i { opacity: 0.8; }
@@ -173,14 +176,10 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        /* --- MOBILE RESPONSIVENESS & SLIDER --- */
         @media (max-width: 768px) {
             .mobile-header { display: flex; }
-            
-            /* UPDATE: Animasi Sidebar diubah pakai Transform GPU agar super halus */
             .sidebar { position: fixed; left: 0; transform: translateX(-100%); top: 0; bottom: 0; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
             .sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.7); }
-            
             .sidebar-overlay.active { display: block; opacity: 1; }
             
             .display-area { padding: 20px 5% 140px 5%; }
@@ -190,7 +189,6 @@
             .input-box { padding: 0 5% 15px 5%; background: rgba(9,9,11,0.98); backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.05); }
             .drag-handle { display: block; }
             
-            /* The Slider Logic */
             .input-box.minimized { transform: translateY(calc(100% - 30px)); }
             .input-box.minimized .drag-handle span { background: var(--accent-blue); transform: scaleX(1.5); }
             .input-box.minimized .feature-toggles, .input-box.minimized .input-wrapper { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
@@ -308,7 +306,6 @@
         const supabaseUrl = 'https://cidccxpjstqnpisuxkcm.supabase.co'; 
         const supabaseKey = 'sb_publishable_CM0leWbXShfwZ9riFphpYQ_r7kRQUPm'; 
         
-        // --- API KEYS ---
         const geminiApiKey = 'AIzaSyA4qZIpPpl4SItjhzZ2yPhzkxhis24wF10'; 
         const groqApiKey = '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'; 
 
@@ -316,13 +313,9 @@
 
         let guestData = { id: '', name: '', age: '', job: '', nim: '', region: '', business: '' };
         
-        // --- ROOM CHAT STATE ---
         let currentChatId = null; 
         let chatContextHistory = []; 
 
-        // ==========================================
-        // UUID GENERATOR
-        // ==========================================
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -330,14 +323,13 @@
             });
         }
 
-        // ==========================================
-        // UI HELPERS & ANIMATIONS
-        // ==========================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i>' : '<i class="fa-solid fa-circle-exclamation" style="color:#ef4444;"></i>';
+            const icon = type === 'success' ? '<i class="fa-solid fa-circle-check" style="color:#10b981;"></i>' : 
+                         type === 'info' ? '<i class="fa-solid fa-database" style="color:var(--accent-purple);"></i>' :
+                         '<i class="fa-solid fa-circle-exclamation" style="color:#ef4444;"></i>';
             toast.innerHTML = `${icon} <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => {
@@ -396,9 +388,6 @@
             `;
         }
 
-        // ==========================================
-        // ROOM CHAT LOGIC (NEW / SWITCH)
-        // ==========================================
         function startNewChat() {
             currentChatId = null;
             chatContextHistory = []; 
@@ -447,9 +436,6 @@
             }, 100);
         }
 
-        // ==========================================
-        // GUEST SESSION MANAGEMENT
-        // ==========================================
         function toggleBusinessInput() {
             const val = document.getElementById('guest-has-business').value;
             const input = document.getElementById('guest-business-name');
@@ -457,7 +443,6 @@
             else { input.style.display = 'none'; input.required = false; input.value = ''; }
         }
 
-        // UPDATE: Fungsi ini ditambahkan async untuk menunggu proses Supabase
         async function startGuestSession() {
             const name = document.getElementById('guest-name').value.trim();
             const age = document.getElementById('guest-age').value.trim();
@@ -475,7 +460,6 @@
 
             guestData = { id, name, age, job, nim, region, business: businessText };
             
-            // SIMPAN DATA KE SUPABASE PADA TABEL BARU
             try {
                 await supabaseClient.from('guest_users').insert([{
                     id: id,
@@ -539,13 +523,9 @@
 
         window.onload = checkSession; 
 
-        // ==========================================
-        // PDF EXPORT FIX (ANTI-BLANK)
-        // ==========================================
         function downloadChatPDF() {
             showToast("Menyiapkan dokumen PDF Chat...", "success");
             
-            // Buat kontainer khusus rendering yang tidak sepenuhnya ngumpet
             const displayArea = document.getElementById('display-area').cloneNode(true);
             const secretContainer = document.createElement('div');
             
@@ -554,7 +534,6 @@
             secretContainer.style.width = '800px';
             secretContainer.style.padding = '20px';
             
-            // Bersihkan data context json & tombol pdf
             const contextData = displayArea.querySelector('.chat-context-data');
             if(contextData) contextData.remove();
             
@@ -563,7 +542,6 @@
             const btns = secretContainer.querySelectorAll('.pdf-btn');
             btns.forEach(b => b.remove());
             
-            // Matikan animasi CSS yg mengganggu html2canvas
             const cards = secretContainer.querySelectorAll('.ai-card, .user-bubble, .chat-turn');
             cards.forEach(card => {
                 card.style.transform = 'none';
@@ -580,7 +558,6 @@
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // Langsung pass object secretContainer ke html2pdf
             html2pdf().set(opt).from(secretContainer).save().then(() => {
                 showToast("PDF Berhasil Diunduh!", "success");
             }).catch(err => {
@@ -589,9 +566,6 @@
             });
         }
 
-        // ==========================================
-        // METAN AI PARSER & FORMATTING
-        // ==========================================
         function formatMarkdown(text) {
             if (!text) return "";
             let formatted = text;
@@ -612,9 +586,6 @@
             return match ? match[1].trim() : '';
         }
 
-        // ==========================================
-        // HYBRID AI LOGIC (CONTEXT AWARE)
-        // ==========================================
         async function fetchAIResponse(messagesArray) {
             try {
                 console.log("Mencoba Groq (Llama 3.1)...");
@@ -655,7 +626,7 @@
 
 
         // ==========================================
-        // MAIN CHAT PROCESSOR
+        // MAIN CHAT PROCESSOR (WITH LOCAL RAG / CACHE)
         // ==========================================
         async function processAnalysis(e) {
             if(e) e.stopPropagation(); 
@@ -675,7 +646,6 @@
 
             if (!isContent && !isSales && !isImage && !isResearch) { showToast("Pilih minimal 1 fitur visual/analisis!", "error"); return; }
 
-            // 1. RENDER USER BUBBLE KE LAYAR
             const displayArea = document.getElementById('display-area');
             const welcomeMsg = document.querySelector('.welcome-wrapper');
             if (welcomeMsg) welcomeMsg.remove();
@@ -713,24 +683,31 @@
             setTimeout(() => displayArea.scrollTo({ top: displayArea.scrollHeight, behavior: 'smooth' }), 50);
 
             try {
-                showLoading("AI sedang mengetik...");
+                showLoading("Menyinkronkan Data Tren...");
 
+                // 1. PENCARIAN DATABASE (GLOBAL CACHE RAG)
                 let existingData = { analisis: '', konten: '', jualan: '', research: '', imageprompt: '' };
                 let foundCache = false;
 
                 if (!currentChatId) {
-                    const { data: allCache } = await supabaseClient.from('trends_data').select('*').eq('platform', platform).order('created_at', { ascending: false });
-                    if (allCache && allCache.length > 0) {
-                        let searchTarget = topic.toLowerCase();
-                        for (let item of allCache) {
-                            let dbTopic = item.trending_topic.toLowerCase();
-                            if (dbTopic === searchTarget || (dbTopic.includes(searchTarget) && Math.abs(dbTopic.length - searchTarget.length) < 5)) {
-                                let text = item.ai_suggestion || '';
-                                if (text.includes('[ANALISIS]')) existingData.analisis = extractSection(text, '[ANALISIS]');
-                                if (text.includes('[KONTEN]')) existingData.konten = extractSection(text, '[KONTEN]');
-                                if (text.includes('[JUALAN]')) existingData.jualan = extractSection(text, '[JUALAN]');
-                                if (text.includes('[RESEARCH]')) existingData.research = extractSection(text, '[RESEARCH]');
-                                if (text.includes('[IMAGEPROMPT]')) existingData.imageprompt = extractSection(text, '[IMAGEPROMPT]');
+                    const { data: globalCache } = await supabaseClient
+                        .from('trends_data')
+                        .select('ai_suggestion')
+                        .eq('platform', platform)
+                        .ilike('trending_topic', `%${topic}%`)
+                        .limit(5); // Ambil maksimal 5 untuk cari yang paling lengkap
+
+                    if (globalCache && globalCache.length > 0) {
+                        for (let item of globalCache) {
+                            // Ekstrak teks mentah (raw data) yang disembunyikan
+                            let match = item.ai_suggestion.match(/<div class="raw-ai-data"[^>]*>([\s\S]*?)<\/div>/);
+                            if (match && match[1]) {
+                                let rawText = match[1];
+                                existingData.analisis = extractSection(rawText, '[ANALISIS]');
+                                existingData.konten = extractSection(rawText, '[KONTEN]');
+                                existingData.jualan = extractSection(rawText, '[JUALAN]');
+                                existingData.research = extractSection(rawText, '[RESEARCH]');
+                                existingData.imageprompt = extractSection(rawText, '[IMAGEPROMPT]');
                                 foundCache = true;
                                 break; 
                             }
@@ -738,34 +715,48 @@
                     }
                 }
 
+                // Cek kebutuhan berdasarkan Toggle yang aktif
                 let needsAnalisis = true && !existingData.analisis; 
                 let needsKonten = isContent && !existingData.konten;
                 let needsJualan = isSales && !existingData.jualan;
                 let needsResearch = isResearch && !existingData.research;
-                let needsImage = isImage && !existingData.imageprompt;
-
+                
                 let finalAiResponse = "";
+                let isQuotaSaved = false;
 
-                if (!needsAnalisis && !needsKonten && !needsJualan && !needsResearch && !needsImage && foundCache) {
-                    if (existingData.analisis) finalAiResponse += `\n[ANALISIS]\n${existingData.analisis}\n`;
-                    if (existingData.research) finalAiResponse += `\n[RESEARCH]\n${existingData.research}\n`;
-                    if (existingData.konten) finalAiResponse += `\n[KONTEN]\n${existingData.konten}\n`;
-                    if (existingData.jualan) finalAiResponse += `\n[JUALAN]\n${existingData.jualan}\n`;
+                // JIKA CACHE DB LENGKAP -> BYPASS API (HEMAT KUOTA)
+                if (!needsAnalisis && !needsKonten && !needsJualan && !needsResearch && foundCache) {
+                    showToast("Sistem Database Pintar Aktif (Hemat Kuota AI) ⚡", "success");
+                    isQuotaSaved = true;
+
+                    // Olah Data Lokal (Personalisasi tanpa API)
+                    let injectContext = (text) => {
+                        if(!text) return "";
+                        return `*(Strategi diolah dari Data Tren Global untuk diaplikasikan pada bisnis **${business}** milik **${guestData.name}**)*:\n\n${text}`;
+                    };
+
+                    if (existingData.analisis) finalAiResponse += `\n[ANALISIS]\n${injectContext(existingData.analisis)}\n`;
+                    if (existingData.research) finalAiResponse += `\n[RESEARCH]\n${injectContext(existingData.research)}\n`;
+                    if (existingData.konten) finalAiResponse += `\n[KONTEN]\n${injectContext(existingData.konten)}\n`;
+                    if (existingData.jualan) finalAiResponse += `\n[JUALAN]\n${injectContext(existingData.jualan)}\n`;
                     if (existingData.imageprompt) finalAiResponse += `\n[IMAGEPROMPT]\n${existingData.imageprompt}\n`;
-                    showToast("Dimuat dari Database Global!", "success");
+
                 } else {
-                    let promptInstruction = `Sebagai pakar digital marketing, jawab / analisis permintaan user terkait topik "${topic}" di platform ${platform}, fokuskan untuk bisnis: ${business}. Jangan gunakan format markdown hash (#) atau bintang (*), gunakan strip (-) biasa.`;
+                    // JIKA INFORMASI KURANG -> PROMPT KE API AI
+                    if(foundCache) showToast("Informasi kurang, meminta bantuan AI API...", "info");
+                    
+                    let promptInstruction = `Sebagai pakar digital marketing, jawab permintaan user terkait topik "${topic}" di platform ${platform}, fokuskan untuk bisnis: ${business}. Jangan gunakan format markdown hash (#) atau bintang (*), gunakan strip (-) biasa.`;
                     
                     if (needsAnalisis) promptInstruction += `\n[ANALISIS]\nBerikan jawaban utama / analisis tren.\n`;
                     if (needsResearch) promptInstruction += `\n[RESEARCH]\nBerikan riset peluang atau data penjualan.\n`;
                     if (needsKonten) promptInstruction += `\n[KONTEN]\nBerikan ide konten viral.\n`;
                     if (needsJualan) promptInstruction += `\n[JUALAN]\nBerikan strategi jualan.\n`;
-                    if (needsImage) promptInstruction += `\n[IMAGEPROMPT]\nOK\n`;
+                    if (isImage) promptInstruction += `\n[IMAGEPROMPT]\nOK\n`;
 
                     if (chatContextHistory.length === 0) {
                         chatContextHistory.push({ role: "user", content: promptInstruction });
                     } else {
-                        chatContextHistory.push({ role: "user", content: `Konteks sebelumnya masih sama (Bisnis: ${business}, Platform: ${platform}). Pertanyaan/Topik lanjutan dari user: "${topic}". Tolong jawab menggunakan struktur tag KOTAK seperti sebelumnya jika memungkinkan, atau jawab natural di dalam [ANALISIS].\n\n` + promptInstruction });
+                        chatContextHistory.push({ role: "user", content: `Konteks sebelumnya masih sama (Bisnis: ${business}, Platform: ${platform}). Lanjutan dari user: "${topic}". Tolong jawab menggunakan struktur tag KOTAK jika memungkinkan.\n\n` + promptInstruction });
                     }
 
                     const aiResult = await fetchAIResponse(chatContextHistory);
@@ -773,13 +764,8 @@
 
                     chatContextHistory.push({ role: "assistant", content: aiTextResponse });
 
-                    // --- PARSING SUPER AMAN (ANTI-BLANK) ---
-                    let newAnalisis = '';
-                    let newResearch = '';
-                    let newKonten = '';
-                    let newJualan = '';
-                    let newImage = '';
-
+                    // PARSING ANTI-BLANK DARI API
+                    let newAnalisis = ''; let newResearch = ''; let newKonten = ''; let newJualan = ''; let newImage = '';
                     const hasOfficialTags = aiTextResponse.includes('[ANALISIS]') || aiTextResponse.includes('[KONTEN]') || aiTextResponse.includes('[JUALAN]') || aiTextResponse.includes('[RESEARCH]');
 
                     if (hasOfficialTags) {
@@ -788,22 +774,15 @@
                         newKonten = aiTextResponse.includes('[KONTEN]') ? extractSection(aiTextResponse, '[KONTEN]') : '';
                         newJualan = aiTextResponse.includes('[JUALAN]') ? extractSection(aiTextResponse, '[JUALAN]') : '';
                         newImage = aiTextResponse.includes('[IMAGEPROMPT]') ? extractSection(aiTextResponse, '[IMAGEPROMPT]') : '';
-                        
-                        if (!newAnalisis && aiTextResponse.indexOf('[') > 0) {
-                            newAnalisis = aiTextResponse.substring(0, aiTextResponse.indexOf('[')).trim();
-                        }
+                        if (!newAnalisis && aiTextResponse.indexOf('[') > 0) newAnalisis = aiTextResponse.substring(0, aiTextResponse.indexOf('[')).trim();
                     } else {
-                        if (isContent && !isSales && !isResearch) {
-                            newKonten = aiTextResponse;
-                        } else if (isSales && !isContent && !isResearch) {
-                            newJualan = aiTextResponse;
-                        } else if (isResearch && !isContent && !isSales) {
-                            newResearch = aiTextResponse;
-                        } else {
-                            newAnalisis = aiTextResponse; 
-                        }
+                        if (isContent && !isSales && !isResearch) newKonten = aiTextResponse;
+                        else if (isSales && !isContent && !isResearch) newJualan = aiTextResponse;
+                        else if (isResearch && !isContent && !isSales) newResearch = aiTextResponse;
+                        else newAnalisis = aiTextResponse; 
                     }
 
+                    // Gabungkan Cache yang ada dengan Data Baru dari API
                     if (existingData.analisis || newAnalisis) finalAiResponse += `\n[ANALISIS]\n${existingData.analisis || newAnalisis}\n`;
                     if (existingData.research || newResearch) finalAiResponse += `\n[RESEARCH]\n${existingData.research || newResearch}\n`;
                     if (existingData.konten || newKonten) finalAiResponse += `\n[KONTEN]\n${existingData.konten || newKonten}\n`;
@@ -813,21 +792,24 @@
                     showToast(`Prompt Terbuat!`, "success");
                 }
 
-                // 3. RENDER AI BUBBLE
+                // 3. RENDER AI BUBBLE UI
                 let delay = 0;
                 let aiHtml = '';
+                
+                // Tambahkan lencana jika ini adalah data hasil bypass kuota
+                const badgeHtml = isQuotaSaved ? `<div class="db-badge"><i class="fa-solid fa-bolt"></i> DARI DATABASE PINTAR</div>` : '';
 
                 const analisisText = extractSection(finalAiResponse, '[ANALISIS]');
-                if (analisisText) { aiHtml += `<div class="ai-card card-analisis" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-robot"></i> Jawaban / Analisis AI</div><div class="content-body">${formatMarkdown(analisisText)}</div></div>`; delay += 0.15; }
+                if (analisisText) { aiHtml += `<div class="ai-card card-analisis" style="animation-delay: ${delay}s">${badgeHtml}<div class="section-title"><i class="fa-solid fa-robot"></i> Jawaban / Analisis AI</div><div class="content-body">${formatMarkdown(analisisText)}</div></div>`; delay += 0.15; }
                 
                 const researchText = extractSection(finalAiResponse, '[RESEARCH]');
-                if (researchText && isResearch) { aiHtml += `<div class="ai-card card-research" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-chart-line"></i> Riset Data</div><div class="content-body">${formatMarkdown(researchText)}</div></div>`; delay += 0.15; }
+                if (researchText && isResearch) { aiHtml += `<div class="ai-card card-research" style="animation-delay: ${delay}s">${badgeHtml}<div class="section-title"><i class="fa-solid fa-chart-line"></i> Riset Data</div><div class="content-body">${formatMarkdown(researchText)}</div></div>`; delay += 0.15; }
 
                 const kontenText = extractSection(finalAiResponse, '[KONTEN]');
-                if (kontenText && isContent) { aiHtml += `<div class="ai-card card-konten" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-video"></i> Ide Konten</div><div class="content-body">${formatMarkdown(kontenText)}</div></div>`; delay += 0.15; }
+                if (kontenText && isContent) { aiHtml += `<div class="ai-card card-konten" style="animation-delay: ${delay}s">${badgeHtml}<div class="section-title"><i class="fa-solid fa-video"></i> Ide Konten</div><div class="content-body">${formatMarkdown(kontenText)}</div></div>`; delay += 0.15; }
                 
                 const jualanText = extractSection(finalAiResponse, '[JUALAN]');
-                if (jualanText && isSales) { aiHtml += `<div class="ai-card card-sales" style="animation-delay: ${delay}s"><div class="section-title"><i class="fa-solid fa-tags"></i> Strategi Sales</div><div class="content-body">${formatMarkdown(jualanText)}</div></div>`; delay += 0.15; }
+                if (jualanText && isSales) { aiHtml += `<div class="ai-card card-sales" style="animation-delay: ${delay}s">${badgeHtml}<div class="section-title"><i class="fa-solid fa-tags"></i> Strategi Sales</div><div class="content-body">${formatMarkdown(jualanText)}</div></div>`; delay += 0.15; }
 
                 if (isImage) {
                     let cleanTopic = topic.replace(/[^a-zA-Z0-9\s]/g, '').trim(); 
@@ -848,9 +830,12 @@
                     `;
                 }
 
+                // 4. EMBED RAW DATA KE DALAM HTML AGAR BISA DIGUNAKAN OLEH USER SELANJUTNYA
+                aiHtml += `<div class="raw-ai-data" style="display:none;">${finalAiResponse}</div>`;
+
                 document.getElementById(`ai_${turnId}`).innerHTML = aiHtml;
 
-                // 4. UPDATE HIDDEN CONTEXT & SAVE KE SUPABASE
+                // UPDATE HIDDEN CONTEXT & SAVE KE SUPABASE
                 let oldContext = displayArea.querySelector('.chat-context-data');
                 if(oldContext) oldContext.remove();
                 
